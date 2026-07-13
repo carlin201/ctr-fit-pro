@@ -16,12 +16,12 @@ import { getFirestore } from "firebase/firestore";
 
 // >>> COLE AQUI a sua configuração do Firebase <<<
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_PROJETO.firebaseapp.com",
-  projectId: "SEU_PROJETO",
-  storageBucket: "SEU_PROJETO.appspot.com",
-  messagingSenderId: "SEU_SENDER_ID",
-  appId: "SEU_APP_ID",
+  apiKey: "AIzaSyCj52UNZGsiUsDCw7B41Di8xZubTn87zZE",
+  authDomain: "ctr-fitness-app.firebaseapp.com",
+  projectId: "ctr-fitness-app",
+  storageBucket: "ctr-fitness-app.firebasestorage.app",
+  messagingSenderId: "871828540628",
+  appId: "1:871828540628:web:9101e90a6e460efa443f41",
 };
 // >>> FIM DA CONFIGURAÇÃO <<<
 
