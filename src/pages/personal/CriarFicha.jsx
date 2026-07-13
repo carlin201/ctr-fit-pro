@@ -1,29 +1,40 @@
 // ============================================================
 // CriarFicha.jsx — Editor completo de ficha de treino.
 // Fluxo:
-//   1. Selecionar aluno.
+//   1. Selecionar aluno (ou vir pré-selecionado via ?aluno=ID na URL).
 //   2. Preencher dados (nome, peso, altura, objetivo, professor).
 //   3. Adicionar exercícios em cada dia da semana.
 //   4. Salvar / Gerar PDF / Enviar para o aluno.
 // ============================================================
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { listarAlunos, salvarFicha, carregarFicha, fichaVazia, DIAS, DIAS_LABEL } from "../../services/fichas.js";
 import { gerarPDFFicha } from "../../services/pdf.js";
 import Toast from "../../components/Toast.jsx";
 import { Plus, Trash2, Save, Download, Send } from "lucide-react";
 
 export default function CriarFicha() {
+  const [searchParams] = useSearchParams();
   const [alunos, setAlunos] = useState([]);
   const [alunoId, setAlunoId] = useState("");
   const [ficha, setFicha] = useState(fichaVazia());
   const [toast, setToast] = useState(null);
 
-  useEffect(() => { listarAlunos().then(setAlunos).catch(() => setAlunos([])); }, []);
+  useEffect(() => {
+    listarAlunos().then((lista) => {
+      setAlunos(lista);
+      const alunoPreSelecionado = searchParams.get("aluno");
+      if (alunoPreSelecionado && lista.some((a) => a.id === alunoPreSelecionado)) {
+        selecionarAluno(alunoPreSelecionado, lista);
+      }
+    }).catch(() => setAlunos([]));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const selecionarAluno = async (id) => {
+  const selecionarAluno = async (id, listaAlunos = alunos) => {
     setAlunoId(id);
     if (!id) { setFicha(fichaVazia()); return; }
-    const aluno = alunos.find((a) => a.id === id);
+    const aluno = listaAlunos.find((a) => a.id === id);
     const existente = await carregarFicha(id);
     if (existente) {
       setFicha({ ...fichaVazia(), ...existente });

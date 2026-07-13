@@ -1,11 +1,13 @@
 // ============================================================
-// Alunos.jsx — Lista de alunos com busca e exclusão.
+// Alunos.jsx — Lista de alunos com busca, edição de ficha e exclusão.
 // ============================================================
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { listarAlunos, deletarAluno } from "../../services/fichas.js";
-import { Search, Trash2 } from "lucide-react";
+import { Search, Trash2, ClipboardEdit } from "lucide-react";
 
 export default function Alunos() {
+  const nav = useNavigate();
   const [list, setList] = useState([]);
   const [q, setQ] = useState("");
   const [sel, setSel] = useState(null);
@@ -33,6 +35,11 @@ export default function Alunos() {
     } finally {
       setExcluindo(false);
     }
+  };
+
+  const editarFicha = (aluno, e) => {
+    e.stopPropagation();
+    nav(`/personal/criar-ficha?aluno=${aluno.id}`);
   };
 
   return (
@@ -67,22 +74,40 @@ export default function Alunos() {
               </div>
             </div>
 
-            <button
-              onClick={(e) => confirmarExclusao(a, e)}
-              disabled={excluindo}
-              title="Apagar aluno"
-              style={{
-                background: "transparent",
-                border: "none",
-                color: "var(--danger, #e53935)",
-                cursor: "pointer",
-                padding: 8,
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <Trash2 size={18} />
-            </button>
+            <div style={{ display: "flex", gap: 4 }}>
+              <button
+                onClick={(e) => editarFicha(a, e)}
+                title="Editar ficha"
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: "var(--text-muted)",
+                  cursor: "pointer",
+                  padding: 8,
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <ClipboardEdit size={18} />
+              </button>
+
+              <button
+                onClick={(e) => confirmarExclusao(a, e)}
+                disabled={excluindo}
+                title="Apagar aluno"
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: "var(--danger, #e53935)",
+                  cursor: "pointer",
+                  padding: 8,
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
           </div>
         ))}
       </div>
