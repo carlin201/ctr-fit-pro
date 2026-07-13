@@ -10,10 +10,6 @@
 //    - Authentication -> Sign-in method -> Email/Password + Google
 //    - Firestore Database -> criar banco
 // ============================================================
-import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 // TODO: Add SDKs for Firebase products that you want to use
