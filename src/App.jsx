@@ -12,6 +12,7 @@
 //   /ficha              -> Ficha de treino
 //   /perfil             -> Perfil do usuário
 //   /primeiro-acesso    -> Formulário inicial
+//   /treino             -> Modo Treino guiado (tela cheia, sem menu inferior)
 //
 // Rotas do Personal (protegidas):
 //   /personal/dashboard
@@ -33,6 +34,7 @@ import Home from "./pages/aluno/Home.jsx";
 import Videos from "./pages/aluno/Videos.jsx";
 import MinhaFicha from "./pages/aluno/MinhaFicha.jsx";
 import Perfil from "./pages/aluno/Perfil.jsx";
+import WorkoutMode from "./pages/aluno/WorkoutMode.jsx";
 
 import PersonalLogin from "./pages/personal/PersonalLogin.jsx";
 import PersonalLayout from "./pages/personal/PersonalLayout.jsx";
@@ -45,7 +47,6 @@ function AlunoRoute({ children }) {
   const { user, loading, profile } = useAuth();
   if (loading) return <div className="loading-screen">Carregando...</div>;
   if (!user) return <Navigate to="/login" replace />;
-  // Se não completou o primeiro acesso, redirecionar
   if (!profile?.nome) return <Navigate to="/primeiro-acesso" replace />;
   return children;
 }
@@ -66,6 +67,16 @@ export default function App() {
 
       {/* Primeiro acesso (precisa estar logado, sem perfil ainda) */}
       <Route path="/primeiro-acesso" element={<FirstAccess />} />
+
+      {/* Modo Treino — tela cheia, fora do AlunoLayout (sem menu inferior) */}
+      <Route
+        path="/treino"
+        element={
+          <AlunoRoute>
+            <WorkoutMode />
+          </AlunoRoute>
+        }
+      />
 
       {/* ALUNO */}
       <Route

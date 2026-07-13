@@ -1,16 +1,19 @@
 // ============================================================
 // MinhaFicha.jsx — Ficha de treino do Aluno.
 // Carrega automaticamente a ficha enviada pelo personal.
-// Permite baixar PDF e compartilhar no WhatsApp.
+// Permite baixar PDF, compartilhar no WhatsApp e iniciar o Modo Treino.
 // ============================================================
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../services/AuthContext.jsx";
 import { carregarFicha, DIAS, DIAS_LABEL } from "../../services/fichas.js";
 import { gerarPDFFicha } from "../../services/pdf.js";
-import { Download, Share2 } from "lucide-react";
+import { diaDaSemanaAtual } from "../../services/workout.js";
+import { Download, Share2, Play } from "lucide-react";
 
 export default function MinhaFicha() {
   const { user } = useAuth();
+  const nav = useNavigate();
   const [ficha, setFicha] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -31,6 +34,9 @@ export default function MinhaFicha() {
       </div>
     );
   }
+
+  const diaHoje = diaDaSemanaAtual();
+  const temTreinoHoje = (ficha.dias?.[diaHoje] || []).length > 0;
 
   const compartilhar = () => {
     let txt = `🏋️ *Ficha CTR Fitness* — ${ficha.nome}\n\n`;
@@ -54,6 +60,16 @@ export default function MinhaFicha() {
         <b style={{ fontSize: 18 }}>{ficha.professor || "-"}</b>
         <p style={{ marginTop: 8, color: "var(--text-muted)" }}>{ficha.objetivo}</p>
       </div>
+
+      {temTreinoHoje && (
+        <button
+          className="btn btn-primary"
+          style={{ marginBottom: 16, fontSize: 16, padding: "16px 20px" }}
+          onClick={() => nav("/treino")}
+        >
+          <Play size={18} fill="white" /> Iniciar Treino
+        </button>
+      )}
 
       <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
         <button className="btn btn-secondary" onClick={() => gerarPDFFicha(ficha)}><Download size={16}/> PDF</button>

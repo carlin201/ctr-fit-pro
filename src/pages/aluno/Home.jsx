@@ -1,11 +1,13 @@
 // ============================================================
 // Home.jsx — Tela inicial do Aluno.
-// Mostra foto, nome, treino de hoje, últimos vídeos, banner e frase motivacional.
+// Mostra foto, nome, treino de hoje, último treino realizado,
+// últimos vídeos, banner e frase motivacional.
 // ============================================================
 import { useEffect, useState } from "react";
 import { useAuth } from "../../services/AuthContext.jsx";
 import { carregarFicha, DIAS, DIAS_LABEL } from "../../services/fichas.js";
 import { loadVideos } from "../../services/videos.js";
+import { diaDaSemanaAtual, formatarTempo } from "../../services/workout.js";
 import { Play } from "lucide-react";
 
 const FRASES = [
@@ -15,12 +17,6 @@ const FRASES = [
   "Todo treino é um passo mais perto do seu objetivo.",
   "Disciplina é escolher entre o que você quer agora e o que você quer mais.",
 ];
-
-function diaDaSemanaAtual() {
-  const idx = new Date().getDay(); // 0 = domingo
-  const mapa = ["domingo", "segunda", "terca", "quarta", "quinta", "sexta", "sabado"];
-  return mapa[idx];
-}
 
 export default function Home() {
   const { user, profile } = useAuth();
@@ -52,6 +48,7 @@ export default function Home() {
   }, []);
 
   const diaLabel = DIAS_LABEL[diaDaSemanaAtual()] || "Hoje";
+  const ultimoTreino = profile?.ultimoTreino;
 
   return (
     <div>
@@ -90,6 +87,26 @@ export default function Home() {
           <p style={{ color: "var(--text-muted)" }}>Nenhum treino registrado para hoje. Aproveite para descansar ou revisar sua ficha completa.</p>
         )}
       </div>
+
+      {ultimoTreino && (
+        <>
+          <h3 className="section-title">Último treino</h3>
+          <div className="card" style={{ marginBottom: 24 }}>
+            <div className="stat-grid" style={{ marginBottom: 0 }}>
+              <div className="stat">
+                <span>Data</span>
+                <b style={{ fontSize: 15 }}>{new Date(ultimoTreino.data).toLocaleDateString("pt-BR")}</b>
+              </div>
+              <div className="stat">
+                <span>Hora</span>
+                <b style={{ fontSize: 15 }}>{new Date(ultimoTreino.data).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</b>
+              </div>
+              <div className="stat"><span>Exercícios</span><b>{ultimoTreino.quantidadeExercicios}</b></div>
+              <div className="stat"><span>Tempo</span><b>{formatarTempo(ultimoTreino.tempoGastoSegundos)}</b></div>
+            </div>
+          </div>
+        </>
+      )}
 
       {ultimosVideos.length > 0 && (
         <>
