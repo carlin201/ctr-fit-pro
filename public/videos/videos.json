@@ -1,0 +1,20 @@
+[
+  {
+    "titulo": "Supino Reto",
+    "categoria": "Peito",
+    "arquivo": "/videos/peito/supino-reto.mp4",
+    "descricao": "Exercício básico para peitoral maior, ombros e tríceps."
+  },
+  {
+    "titulo": "Puxada Alta (Pulley)",
+    "categoria": "Costas",
+    "arquivo": "/videos/costas/pulley.mp4",
+    "descricao": "Trabalha o latíssimo do dorso, redondos e bíceps."
+  },
+  {
+    "titulo": "Leg Press 45°",
+    "categoria": "Pernas",
+    "arquivo": "/videos/pernas/leg-press.mp4",
+    "descricao": "Movimento composto para quadríceps, glúteos e posterior."
+  }
+]
