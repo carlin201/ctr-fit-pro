@@ -12,7 +12,7 @@
 //   updatedAt
 // }
 // ============================================================
-import { doc, getDoc, setDoc, collection, getDocs } from "firebase/firestore";
+import { doc, getDoc, setDoc, deleteDoc, collection, getDocs } from "firebase/firestore";
 import { db } from "./firebase.js";
 
 export const DIAS = ["segunda", "terca", "quarta", "quinta", "sexta", "sabado", "domingo"];
@@ -48,4 +48,9 @@ export async function carregarFicha(alunoId) {
 export async function listarAlunos() {
   const snap = await getDocs(collection(db, "alunos"));
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
+export async function deletarAluno(alunoId) {
+  await deleteDoc(doc(db, "alunos", alunoId));
+  await deleteDoc(doc(db, "fichas", alunoId)).catch(() => {});
 }

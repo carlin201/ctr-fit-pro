@@ -1,14 +1,15 @@
 // ============================================================
-// Alunos.jsx — Lista de alunos com busca.
+// Alunos.jsx — Lista de alunos com busca e exclusão.
 // ============================================================
 import { useEffect, useMemo, useState } from "react";
-import { listarAlunos } from "../../services/fichas.js";
-import { Search } from "lucide-react";
+import { listarAlunos, deletarAluno } from "../../services/fichas.js";
+import { Search, Trash2 } from "lucide-react";
 
 export default function Alunos() {
   const [list, setList] = useState([]);
   const [q, setQ] = useState("");
   const [sel, setSel] = useState(null);
+  const [excluindo, setExcluindo] = useState(false);
 
   useEffect(() => { listarAlunos().then(setList).catch(() => setList([])); }, []);
 
@@ -16,6 +17,23 @@ export default function Alunos() {
     () => list.filter((a) => (a.nome || "").toLowerCase().includes(q.toLowerCase())),
     [list, q]
   );
+
+  const confirmarExclusao = async (aluno, e) => {
+    e.stopPropagation();
+    const confirmar = window.confirm(`Tem certeza que deseja apagar ${aluno.nome || "este aluno"}? Essa ação não pode ser desfeita.`);
+    if (!confirmar) return;
+
+    setExcluindo(true);
+    try {
+      await deletarAluno(aluno.id);
+      setList((prev) => prev.filter((a) => a.id !== aluno.id));
+      if (sel?.id === aluno.id) setSel(null);
+    } catch (err) {
+      alert("Não foi possível apagar o aluno. Tente novamente.");
+    } finally {
+      setExcluindo(false);
+    }
+  };
 
   return (
     <div>
@@ -29,18 +47,42 @@ export default function Alunos() {
       <div style={{ maxWidth: 640 }}>
         {filtered.length === 0 && <p style={{ color: "var(--text-muted)" }}>Nenhum aluno cadastrado.</p>}
         {filtered.map((a) => (
-          <div key={a.id} className={`aluno-item ${sel?.id === a.id ? "selected" : ""}`} onClick={() => setSel(a)}>
-            <div className="avatar" style={{ overflow: "hidden" }}>
-              {a.foto ? (
-                <img src={a.foto} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
-              ) : (
-                (a.nome || "?")[0]?.toUpperCase()
-              )}
+          <div
+            key={a.id}
+            className={`aluno-item ${sel?.id === a.id ? "selected" : ""}`}
+            onClick={() => setSel(a)}
+            style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div className="avatar" style={{ overflow: "hidden" }}>
+                {a.foto ? (
+                  <img src={a.foto} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
+                ) : (
+                  (a.nome || "?")[0]?.toUpperCase()
+                )}
+              </div>
+              <div className="info">
+                <h4>{a.nome || "Sem nome"}</h4>
+                <p>{a.email} · {a.objetivo || "-"}</p>
+              </div>
             </div>
-            <div className="info">
-              <h4>{a.nome || "Sem nome"}</h4>
-              <p>{a.email} · {a.objetivo || "-"}</p>
-            </div>
+
+            <button
+              onClick={(e) => confirmarExclusao(a, e)}
+              disabled={excluindo}
+              title="Apagar aluno"
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "var(--danger, #e53935)",
+                cursor: "pointer",
+                padding: 8,
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <Trash2 size={18} />
+            </button>
           </div>
         ))}
       </div>
