@@ -3,7 +3,6 @@
    Temas: Vermelho (padrão), Preto, Branco.
    ============================================================ */
 
-/* Tokens de design — tema Vermelho (padrão) -------------------- */
 :root,
 [data-theme="vermelho"] {
   --bg: #0a0a0a;
@@ -24,7 +23,6 @@
   --gradient-dark: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
 }
 
-/* Tema Preto — mais neutro, sem tanto vermelho no fundo -------- */
 [data-theme="preto"] {
   --bg: #000000;
   --bg-elev: #0d0d0d;
@@ -40,7 +38,6 @@
   --gradient-dark: linear-gradient(180deg, #111 0%, #000 100%);
 }
 
-/* Tema Branco — modo claro ------------------------------------- */
 [data-theme="branco"] {
   --bg: #f5f5f5;
   --bg-elev: #ffffff;
@@ -57,7 +54,6 @@
   --gradient-dark: linear-gradient(180deg, #ffffff 0%, #f0f0f0 100%);
 }
 
-/* Reset -------------------------------------------------------- */
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body, #root { height: 100%; }
 html { overflow-x: hidden; overscroll-behavior-y: none; }
@@ -76,16 +72,13 @@ input, select, textarea { font-family: inherit; }
 a { color: inherit; text-decoration: none; }
 img { max-width: 100%; display: block; }
 
-/* Splash screen (fade-out controlado pelo main.jsx) ------------ */
 .splash-hide { opacity: 0 !important; pointer-events: none; }
 
-/* Tela de carregamento ---------------------------------------- */
 .loading-screen {
   display: flex; align-items: center; justify-content: center;
   min-height: 100vh; color: var(--text-muted); font-weight: 500;
 }
 
-/* Transição de página (fade + leve slide) ---------------------- */
 .page-transition {
   animation: pageFadeIn .25s ease both;
   width: 100%;
@@ -97,9 +90,6 @@ img { max-width: 100%; display: block; }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Botões --------------------------------------------------------
-   Feedback ao toque: leve "afundada" (scale) em todos os botões.
-   Funciona em qualquer .btn, .chip, .icon-btn, itens do bottom-nav. */
 .btn, .chip, .icon-btn, .bottom-nav a, .aluno-item, .video-card, .card {
   -webkit-tap-highlight-color: transparent;
   transition: transform .15s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease, color .2s ease;
@@ -127,7 +117,6 @@ img { max-width: 100%; display: block; }
 .btn-ghost:hover { color: var(--text); }
 .btn-danger { background: transparent; color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
 
-/* Inputs ------------------------------------------------------- */
 .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
 .field label { font-size: 13px; font-weight: 500; color: var(--text-muted); }
 .input, .select, .textarea {
@@ -140,8 +129,6 @@ img { max-width: 100%; display: block; }
 }
 .textarea { min-height: 60px; resize: vertical; font-family: inherit; }
 
-/* Cards ---------------------------------------------------------
-   Toque no mobile: leve scale. Hover (efeito elevação) só no desktop. */
 .card {
   background: var(--bg-card); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 20px; backdrop-filter: blur(10px);
@@ -151,10 +138,9 @@ img { max-width: 100%; display: block; }
   .card:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
 }
 
-/* Layout do Aluno — ocupa a tela inteira, sem rolagem lateral --- */
 .aluno-layout {
   min-height: 100vh;
-  min-height: 100dvh; /* corrige barra de endereço do mobile */
+  min-height: 100dvh;
   display: flex; flex-direction: column;
   background: radial-gradient(ellipse at top, rgba(220,38,38,0.08), transparent 60%), var(--bg);
   width: 100%;
@@ -166,7 +152,6 @@ img { max-width: 100%; display: block; }
   overflow-x: hidden;
 }
 
-/* Menu inferior — estilo app nativo, fixo, ícones maiores ------- */
 .bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
   display: grid; grid-template-columns: repeat(4, 1fr);
@@ -185,7 +170,6 @@ img { max-width: 100%; display: block; }
 .bottom-nav a:active { transform: scale(0.92); }
 .bottom-nav a svg { width: 24px; height: 24px; transition: transform .18s ease; }
 
-/* Página de login --------------------------------------------- */
 .login-page {
   min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column;
   background: var(--bg); position: relative; overflow-x: hidden;
@@ -216,7 +200,6 @@ img { max-width: 100%; display: block; }
 .login-link { display: block; text-align: center; margin-top: 18px; color: var(--text-muted); font-size: 14px; }
 .login-link b { color: var(--primary); }
 
-/* Vídeos ------------------------------------------------------- */
 .chip-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin: 0 -20px 20px; padding-left: 20px; padding-right: 20px; -webkit-overflow-scrolling: touch; }
 .chip-row::-webkit-scrollbar { display: none; }
 .chip {
@@ -244,7 +227,6 @@ img { max-width: 100%; display: block; }
 .video-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; line-height: 1.3; }
 .video-info span { font-size: 12px; color: var(--text-muted); }
 
-/* Modal player — em telas pequenas, ocupa a tela inteira -------- */
 .modal-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100;
   display: flex; align-items: center; justify-content: center; padding: 20px;
@@ -268,7 +250,6 @@ img { max-width: 100%; display: block; }
   .modal-close { top: calc(16px + env(safe-area-inset-top)); }
 }
 
-/* Home aluno --------------------------------------------------- */
 .hero-card {
   background: var(--gradient-red); border-radius: 20px; padding: 24px;
   color: white; display: flex; align-items: center; gap: 16px;
@@ -289,7 +270,6 @@ img { max-width: 100%; display: block; }
 .stat span { color: var(--text-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
 .stat b { display: block; font-size: 22px; font-weight: 700; margin-top: 6px; }
 
-/* Banner da academia (Home) ------------------------------------ */
 .banner-academia {
   border-radius: 18px; overflow: hidden; margin-bottom: 24px;
   position: relative; min-height: 120px;
@@ -303,7 +283,6 @@ img { max-width: 100%; display: block; }
   text-shadow: 0 2px 8px rgba(0,0,0,0.5); padding: 20px;
 }
 
-/* Mini card de vídeo (usado em "Últimos vídeos" da Home) -------- */
 .mini-video-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 6px; margin: 0 -20px 24px; padding-left: 20px; padding-right: 20px; -webkit-overflow-scrolling: touch; }
 .mini-video-row::-webkit-scrollbar { display: none; }
 .mini-video-card {
@@ -317,7 +296,6 @@ img { max-width: 100%; display: block; }
 .mini-video-thumb svg { width: 24px; height: 24px; color: white; }
 .mini-video-card p { font-size: 12px; font-weight: 600; padding: 8px; line-height: 1.3; }
 
-/* Ficha -------------------------------------------------------- */
 .dia-card { margin-bottom: 16px; }
 .dia-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 12px; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
 .exercicio {
@@ -329,7 +307,6 @@ img { max-width: 100%; display: block; }
 .exercicio .obs { font-size: 12px; color: var(--text-muted); font-style: italic; margin-top: 4px; }
 .empty-day { color: var(--text-muted); font-size: 13px; padding: 8px 0; }
 
-/* Personal layout --------------------------------------------- */
 .personal-layout { display: flex; min-height: 100vh; min-height: 100dvh; background: var(--bg); width: 100%; max-width: 100vw; overflow-x: hidden; }
 .side-nav {
   width: 240px; background: var(--bg-elev); border-right: 1px solid var(--border);
@@ -347,7 +324,6 @@ img { max-width: 100%; display: block; }
 .side-nav .logout { margin-top: auto; color: #ef4444; }
 .personal-main { flex: 1; padding: 32px; overflow-x: hidden; }
 
-/* Criar ficha ------------------------------------------------- */
 .ex-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 32px; gap: 8px; margin-bottom: 8px; }
 .ex-row-full { display: grid; grid-template-columns: 1fr 32px; gap: 8px; margin-bottom: 12px; }
 .icon-btn {
@@ -368,7 +344,6 @@ img { max-width: 100%; display: block; }
 .dia-editor summary::-webkit-details-marker { display: none; }
 .dia-editor[open] summary { margin-bottom: 12px; }
 
-/* Aluno cards (lista) ----------------------------------------- */
 .aluno-item {
   display: flex; align-items: center; gap: 12px; padding: 14px;
   border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border);
@@ -384,7 +359,6 @@ img { max-width: 100%; display: block; }
 .aluno-item .info h4 { font-size: 14px; font-weight: 600; }
 .aluno-item .info p { font-size: 12px; color: var(--text-muted); }
 
-/* Seletor de tema (Perfil) -------------------------------------- */
 .theme-picker { display: flex; gap: 12px; margin-top: 8px; }
 .theme-option {
   flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;
@@ -397,8 +371,27 @@ img { max-width: 100%; display: block; }
 .theme-option span { font-size: 12px; color: var(--text-muted); font-weight: 500; }
 .theme-option.selected span { color: var(--text); }
 
-/* Toast simples ----------------------------------------------- */
 .toast {
   position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
   background: var(--bg-elev); border: 1px solid var(--border);
-  padding: 12px 20px;
+  padding: 12px 20px; border-radius: 12px; z-index: 200;
+  font-size: 14px; box-shadow: var(--shadow-lg); animation: slideUp .3s;
+  max-width: calc(100vw - 40px);
+}
+.toast.success { border-color: var(--success); }
+.toast.error { border-color: #ef4444; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translate(-50%, 20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+@media (max-width: 768px) {
+  .personal-layout { flex-direction: column; }
+  .side-nav { width: 100%; height: auto; position: static; flex-direction: row; overflow-x: auto; padding: 12px; }
+  .side-nav .brand { display: none; }
+  .side-nav a { flex-shrink: 0; }
+  .side-nav .logout { margin-top: 0; margin-left: auto; }
+  .personal-main { padding: 20px 16px 40px; }
+  .ex-row { grid-template-columns: 1fr 1fr; }
+  .ex-row > :nth-child(1) { grid-column: 1 / -1; }
+  .ex-row > :nth-child(5) { grid-column: 1 / -1; }
+}
