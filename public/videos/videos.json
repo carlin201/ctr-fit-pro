@@ -1,20 +1,23 @@
 [
   {
+    "id": 1,
     "titulo": "Supino Reto",
     "categoria": "Peito",
     "arquivo": "/videos/peito/supino-reto.mp4",
-    "descricao": "Exercício básico para peitoral maior, ombros e tríceps."
+    "descricao": "Supino reto com barra."
   },
   {
-    "titulo": "Puxada Alta (Pulley)",
+    "id": 2,
+    "titulo": "Crucifixo",
+    "categoria": "Peito",
+    "arquivo": "/videos/peito/crucifixo.mp4",
+    "descricao": "Crucifixo máquina."
+  },
+  {
+    "id": 3,
+    "titulo": "Levantamento Terra",
     "categoria": "Costas",
-    "arquivo": "/videos/costas/pulley.mp4",
-    "descricao": "Trabalha o latíssimo do dorso, redondos e bíceps."
-  },
-  {
-    "titulo": "Leg Press 45°",
-    "categoria": "Pernas",
-    "arquivo": "/videos/pernas/leg-press.mp4",
-    "descricao": "Movimento composto para quadríceps, glúteos e posterior."
+    "arquivo": "/videos/costas/levantamento-terra.mp4",
+    "descricao": "Levantamento terra."
   }
 ]

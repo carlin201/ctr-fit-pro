@@ -1,9 +1,7 @@
-// ============================================================
-// PersonalLogin.jsx — Login do Personal (usuário/senha fixos).
-// As credenciais estão em src/services/personalConfig.js
-// ============================================================
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { signInAnonymously } from "firebase/auth";
+import { auth } from "../../services/firebase.js";
 import { PERSONAL_USER, PERSONAL_PASS } from "../../services/personalConfig.js";
 import Toast from "../../components/Toast.jsx";
 import { Dumbbell } from "lucide-react";
@@ -14,11 +12,16 @@ export default function PersonalLogin() {
   const [pass, setPass] = useState("");
   const [toast, setToast] = useState(null);
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
     if (user.trim().toUpperCase() === PERSONAL_USER && pass === PERSONAL_PASS) {
-      localStorage.setItem("ctr_personal_auth", "1");
-      nav("/personal/dashboard", { replace: true });
+      try {
+        await signInAnonymously(auth);
+        localStorage.setItem("ctr_personal_auth", "1");
+        nav("/personal/dashboard", { replace: true });
+      } catch (err) {
+        setToast({ type: "error", msg: "Erro ao autenticar. Tente novamente." });
+      }
     } else {
       setToast({ type: "error", msg: "Usuário ou senha incorretos." });
     }
