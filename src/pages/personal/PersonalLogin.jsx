@@ -26,7 +26,7 @@ export default function PersonalLogin() {
 
   return (
     <div className="login-page">
-      <div className="login-banner"><img src="/img/logo.svg" alt="CTR" className="logo" /></div>
+      <div className="login-banner"><img src="/img/logo.png" alt="CTR" className="logo" /></div>
       <div className="login-content">
         <h1 className="login-title"><Dumbbell style={{ display: "inline", verticalAlign: "-4px" }} /> Personal</h1>
         <p className="login-sub">Acesso restrito ao professor.</p>

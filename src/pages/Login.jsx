@@ -35,7 +35,7 @@ export default function Login() {
     <div className="login-page">
       {/* Banner + logo */}
       <div className="login-banner">
-        <img src="/img/logo.svg" alt="CTR Fitness" className="logo" />
+        <img src="/img/logo.png" alt="CTR Fitness" className="logo" />
       </div>
 
       <div className="login-content">
