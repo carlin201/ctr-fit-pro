@@ -4,11 +4,11 @@
 //   1. Selecionar aluno (ou vir pré-selecionado via ?aluno=ID na URL).
 //   2. Preencher dados (nome, peso, altura, objetivo, professor).
 //   3. Adicionar exercícios em cada dia da semana.
-//   4. Salvar / Gerar PDF / Enviar para o aluno.
+//   4. Salvar / Gerar PDF / Enviar para o aluno / Apagar ficha.
 // ============================================================
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { listarAlunos, salvarFicha, carregarFicha, fichaVazia, DIAS, DIAS_LABEL } from "../../services/fichas.js";
+import { listarAlunos, salvarFicha, carregarFicha, deletarFicha, fichaVazia, DIAS, DIAS_LABEL } from "../../services/fichas.js";
 import { gerarPDFFicha } from "../../services/pdf.js";
 import Toast from "../../components/Toast.jsx";
 import { Plus, Trash2, Save, Download, Send } from "lucide-react";
@@ -18,6 +18,8 @@ export default function CriarFicha() {
   const [alunos, setAlunos] = useState([]);
   const [alunoId, setAlunoId] = useState("");
   const [ficha, setFicha] = useState(fichaVazia());
+  const [fichaExiste, setFichaExiste] = useState(false);
+  const [excluindoFicha, setExcluindoFicha] = useState(false);
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
@@ -33,11 +35,12 @@ export default function CriarFicha() {
 
   const selecionarAluno = async (id, listaAlunos = alunos) => {
     setAlunoId(id);
-    if (!id) { setFicha(fichaVazia()); return; }
+    if (!id) { setFicha(fichaVazia()); setFichaExiste(false); return; }
     const aluno = listaAlunos.find((a) => a.id === id);
     const existente = await carregarFicha(id);
     if (existente) {
       setFicha({ ...fichaVazia(), ...existente });
+      setFichaExiste(true);
     } else {
       setFicha({
         ...fichaVazia(),
@@ -46,6 +49,7 @@ export default function CriarFicha() {
         altura: aluno?.altura || "",
         objetivo: aluno?.objetivo || "",
       });
+      setFichaExiste(false);
     }
   };
 
@@ -69,9 +73,28 @@ export default function CriarFicha() {
     if (!alunoId) return setToast({ type: "error", msg: "Selecione um aluno primeiro." });
     try {
       await salvarFicha(alunoId, ficha);
+      setFichaExiste(true);
       setToast({ type: "success", msg: mostrar });
     } catch (e) {
       setToast({ type: "error", msg: "Erro ao salvar: " + (e.message || "verifique o Firebase.") });
+    }
+  };
+
+  const apagarFicha = async () => {
+    if (!alunoId) return;
+    const confirmar = window.confirm("Tem certeza que deseja apagar esta ficha? Essa ação não pode ser desfeita.");
+    if (!confirmar) return;
+
+    setExcluindoFicha(true);
+    try {
+      await deletarFicha(alunoId);
+      setFicha(fichaVazia());
+      setFichaExiste(false);
+      setToast({ type: "success", msg: "Ficha apagada com sucesso." });
+    } catch (e) {
+      setToast({ type: "error", msg: "Erro ao apagar a ficha. Tente novamente." });
+    } finally {
+      setExcluindoFicha(false);
     }
   };
 
@@ -142,6 +165,16 @@ export default function CriarFicha() {
             <button className="btn btn-secondary" style={{ width: "auto" }} onClick={() => salvar()}><Save size={16}/> Salvar</button>
             <button className="btn btn-secondary" style={{ width: "auto" }} onClick={() => gerarPDFFicha(ficha)}><Download size={16}/> Gerar PDF</button>
             <button className="btn btn-primary" style={{ width: "auto" }} onClick={() => salvar("Ficha enviada para o aluno!")}><Send size={16}/> Enviar para o aluno</button>
+            {fichaExiste && (
+              <button
+                className="btn btn-danger"
+                style={{ width: "auto" }}
+                onClick={apagarFicha}
+                disabled={excluindoFicha}
+              >
+                <Trash2 size={16}/> {excluindoFicha ? "Apagando..." : "Apagar Ficha"}
+              </button>
+            )}
           </div>
         </>
       )}

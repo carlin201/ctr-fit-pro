@@ -54,3 +54,7 @@ export async function deletarAluno(alunoId) {
   await deleteDoc(doc(db, "alunos", alunoId));
   await deleteDoc(doc(db, "fichas", alunoId)).catch(() => {});
 }
+
+export async function deletarFicha(alunoId) {
+  await deleteDoc(doc(db, "fichas", alunoId));
+}
