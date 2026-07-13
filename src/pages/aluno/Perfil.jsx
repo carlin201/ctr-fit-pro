@@ -1,14 +1,47 @@
 // ============================================================
 // Perfil.jsx — Perfil do Aluno.
-// Exibe foto, nome, email e dados. Permite sair da conta.
+// Exibe foto, nome, email e dados. Permite trocar foto e sair da conta.
 // ============================================================
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../services/AuthContext.jsx";
-import { LogOut } from "lucide-react";
+import { LogOut, Camera } from "lucide-react";
+
+// Redimensiona e comprime a imagem antes de salvar, pra caber no Firestore
+function comprimirImagem(file, tamanho = 200, qualidade = 0.7) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = tamanho;
+        canvas.height = tamanho;
+        const ctx = canvas.getContext("2d");
+
+        // Corta a imagem em quadrado (crop central) antes de redimensionar
+        const lado = Math.min(img.width, img.height);
+        const offsetX = (img.width - lado) / 2;
+        const offsetY = (img.height - lado) / 2;
+
+        ctx.drawImage(img, offsetX, offsetY, lado, lado, 0, 0, tamanho, tamanho);
+        resolve(canvas.toDataURL("image/jpeg", qualidade));
+      };
+      img.onerror = () => reject(new Error("Não foi possível carregar a imagem."));
+      img.src = e.target.result;
+    };
+    reader.onerror = () => reject(new Error("Não foi possível ler o arquivo."));
+    reader.readAsDataURL(file);
+  });
+}
 
 export default function Perfil() {
-  const { user, profile, logout } = useAuth();
+  const { user, profile, saveProfile, logout } = useAuth();
   const nav = useNavigate();
+  const fileInputRef = useRef(null);
+  const [enviando, setEnviando] = useState(false);
+  const [erro, setErro] = useState("");
+
   const iniciais = (profile?.nome || "?")[0].toUpperCase();
 
   const sair = async () => {
@@ -16,14 +49,89 @@ export default function Perfil() {
     nav("/login", { replace: true });
   };
 
+  const escolherFoto = () => {
+    fileInputRef.current?.click();
+  };
+
+  const onFotoSelecionada = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setErro("Selecione um arquivo de imagem válido.");
+      return;
+    }
+
+    setErro("");
+    setEnviando(true);
+    try {
+      const base64 = await comprimirImagem(file, 200, 0.7);
+      await saveProfile({ foto: base64 });
+    } catch (err) {
+      setErro("Não foi possível salvar a foto. Tente uma imagem menor.");
+    } finally {
+      setEnviando(false);
+      e.target.value = ""; // permite escolher o mesmo arquivo de novo depois
+    }
+  };
+
   return (
     <div>
       <h1 className="section-title" style={{ fontSize: 28, fontWeight: 800 }}>Perfil</h1>
 
       <div className="card" style={{ textAlign: "center", padding: 32 }}>
-        <div className="hero-avatar" style={{ margin: "0 auto 16px", width: 88, height: 88, fontSize: 32, background: "var(--gradient-red)" }}>
-          {user?.photoURL ? <img src={user.photoURL} alt="" /> : iniciais}
+        <div
+          className="hero-avatar"
+          style={{
+            margin: "0 auto 16px",
+            width: 88,
+            height: 88,
+            fontSize: 32,
+            background: "var(--gradient-red)",
+            position: "relative",
+            cursor: "pointer",
+            overflow: "hidden",
+            borderRadius: "50%",
+          }}
+          onClick={escolherFoto}
+          title="Clique para alterar a foto"
+        >
+          {profile?.foto ? (
+            <img src={profile.foto} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          ) : user?.photoURL ? (
+            <img src={user.photoURL} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          ) : (
+            iniciais
+          )}
+
+          <div
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              background: "rgba(0,0,0,0.55)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "4px 0",
+            }}
+          >
+            <Camera size={14} color="#fff" />
+          </div>
         </div>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          style={{ display: "none" }}
+          onChange={onFotoSelecionada}
+        />
+
+        {enviando && <p style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 8 }}>Enviando foto...</p>}
+        {erro && <p style={{ color: "var(--danger, #e53935)", fontSize: 13, marginBottom: 8 }}>{erro}</p>}
+
         <h2 style={{ fontSize: 22, fontWeight: 700 }}>{profile?.nome || "Aluno"}</h2>
         <p style={{ color: "var(--text-muted)", marginTop: 4 }}>{user?.email}</p>
       </div>
