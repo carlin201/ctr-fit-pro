@@ -3,8 +3,10 @@
   <head>
     <!-- Meta tags básicas -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#0a0a0a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
     <!-- SEO -->
     <title>CTR Fitness — Sua academia no bolso</title>
@@ -19,8 +21,30 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <style>
+      /* Estilo inline da splash, pra aparecer instantaneamente antes do CSS/JS carregar */
+      #splash-screen {
+        position: fixed; inset: 0; z-index: 9999;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 16px; background: #0a0a0a;
+        transition: opacity .4s ease;
+      }
+      #splash-screen img { width: 96px; height: 96px; }
+      #splash-screen span {
+        color: #fff; font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 22px; font-weight: 800; letter-spacing: -0.5px;
+      }
+      #splash-screen.splash-hide { opacity: 0; pointer-events: none; }
+    </style>
   </head>
   <body>
+    <!-- Splash screen: some no main.jsx assim que o app monta -->
+    <div id="splash-screen">
+      <img src="/img/logo.png" alt="CTR Fitness" />
+      <span>CTR Fitness</span>
+    </div>
+
     <!-- Ponto de montagem do React -->
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
