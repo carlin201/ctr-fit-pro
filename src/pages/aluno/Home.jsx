@@ -4,11 +4,12 @@
 // últimos vídeos, banner e frase motivacional.
 // ============================================================
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../services/AuthContext.jsx";
-import { carregarFicha, DIAS, DIAS_LABEL } from "../../services/fichas.js";
+import { carregarFicha, DIAS_LABEL } from "../../services/fichas.js";
 import { loadVideos } from "../../services/videos.js";
 import { diaDaSemanaAtual, formatarTempo } from "../../services/workout.js";
-import { Play } from "lucide-react";
+import { ClipboardList, PlayCircle, TrendingUp, Target, Weight, Ruler, ArrowRight } from "lucide-react";
 
 const FRASES = [
   "Consistência supera intensidade. Um treino leve feito hoje vale mais que o treino perfeito de amanhã.",
@@ -27,14 +28,22 @@ export default function Home() {
 
   const [treinoHoje, setTreinoHoje] = useState(null);
   const [carregandoTreino, setCarregandoTreino] = useState(true);
-  const [ultimosVideos, setUltimosVideos] = useState([]);
+  const [totalVideos, setTotalVideos] = useState(0);
+  const [ficha, setFicha] = useState(null);
+  const [totalExerciciosFicha, setTotalExerciciosFicha] = useState(0);
 
   useEffect(() => {
     if (user?.uid) {
       carregarFicha(user.uid)
-        .then((ficha) => {
+        .then((f) => {
+          setFicha(f);
           const dia = diaDaSemanaAtual();
-          setTreinoHoje(ficha?.dias?.[dia] || []);
+          setTreinoHoje(f?.dias?.[dia] || []);
+          // Conta total de exercícios cadastrados na semana toda
+          const total = f?.dias
+            ? Object.values(f.dias).reduce((acc, arr) => acc + (arr?.length || 0), 0)
+            : 0;
+          setTotalExerciciosFicha(total);
         })
         .catch(() => setTreinoHoje([]))
         .finally(() => setCarregandoTreino(false));
@@ -44,11 +53,12 @@ export default function Home() {
   }, [user?.uid]);
 
   useEffect(() => {
-    loadVideos().then((videos) => setUltimosVideos(videos.slice(0, 6)));
+    loadVideos().then((videos) => setTotalVideos(videos.length));
   }, []);
 
   const diaLabel = DIAS_LABEL[diaDaSemanaAtual()] || "Hoje";
   const ultimoTreino = profile?.ultimoTreino;
+  const dataUltimaFicha = ficha?.updatedAt ? new Date(ficha.updatedAt).toLocaleDateString("pt-BR") : "-";
 
   return (
     <div>
@@ -68,8 +78,28 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="banner-academia">
-        <span>💪 CTR Fitness — sua evolução começa aqui</span>
+      {/* Ações rápidas */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 24 }}>
+        <Link to="/ficha" className="card action-card">
+          <ClipboardList size={22} />
+          <b>Minha ficha</b>
+          <ArrowRight size={14} className="action-arrow" />
+        </Link>
+        <Link to="/videos" className="card action-card">
+          <PlayCircle size={22} />
+          <b>Biblioteca</b>
+          <ArrowRight size={14} className="action-arrow" />
+        </Link>
+        <Link to="/evolucao" className="card action-card">
+          <TrendingUp size={22} />
+          <b>Evolução</b>
+          <ArrowRight size={14} className="action-arrow" />
+        </Link>
+        <Link to="/historico" className="card action-card">
+          <ClipboardList size={22} />
+          <b>Histórico</b>
+          <ArrowRight size={14} className="action-arrow" />
+        </Link>
       </div>
 
       <h3 className="section-title">Treino de hoje · {diaLabel}</h3>
@@ -86,6 +116,27 @@ export default function Home() {
         ) : (
           <p style={{ color: "var(--text-muted)" }}>Nenhum treino registrado para hoje. Aproveite para descansar ou revisar sua ficha completa.</p>
         )}
+      </div>
+
+      {/* Resumo de conteúdo */}
+      <h3 className="section-title">Resumo</h3>
+      <div className="stat-grid">
+        <div className="card stat">
+          <span>Última ficha</span>
+          <b style={{ fontSize: 16 }}>{dataUltimaFicha}</b>
+        </div>
+        <div className="card stat">
+          <span>Exercícios</span>
+          <b>{totalExerciciosFicha}</b>
+        </div>
+        <div className="card stat">
+          <span>Vídeos</span>
+          <b>{totalVideos}</b>
+        </div>
+        <div className="card stat">
+          <span>Último acesso</span>
+          <b style={{ fontSize: 15 }}>{ultimoTreino ? new Date(ultimoTreino.data).toLocaleDateString("pt-BR") : "-"}</b>
+        </div>
       </div>
 
       {ultimoTreino && (
@@ -108,26 +159,12 @@ export default function Home() {
         </>
       )}
 
-      {ultimosVideos.length > 0 && (
-        <>
-          <h3 className="section-title">Últimos vídeos</h3>
-          <div className="mini-video-row">
-            {ultimosVideos.map((v, i) => (
-              <div key={i} className="mini-video-card">
-                <div className="mini-video-thumb"><Play fill="white" /></div>
-                <p>{v.titulo}</p>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-
       <h3 className="section-title">Seus dados</h3>
       <div className="stat-grid">
-        <div className="card stat"><span>Peso</span><b>{profile?.peso || "-"} kg</b></div>
-        <div className="card stat"><span>Altura</span><b>{profile?.altura || "-"} cm</b></div>
-        <div className="card stat"><span>Idade</span><b>{profile?.idade || "-"}</b></div>
-        <div className="card stat"><span>Objetivo</span><b style={{ fontSize: 16 }}>{profile?.objetivo || "-"}</b></div>
+        <div className="card stat"><Weight size={14} style={{ color: "var(--primary)" }} /><span>Peso</span><b>{profile?.peso || "-"} kg</b></div>
+        <div className="card stat"><Ruler size={14} style={{ color: "var(--primary)" }} /><span>Altura</span><b>{profile?.altura || "-"} cm</b></div>
+        <div className="card stat"><Target size={14} style={{ color: "var(--primary)" }} /><span>Objetivo</span><b style={{ fontSize: 15 }}>{profile?.objetivo || "-"}</b></div>
+        <div className="card stat"><span>Nível</span><b style={{ fontSize: 15 }}>{profile?.nivel || "-"}</b></div>
       </div>
 
       <h3 className="section-title">Dica CTR</h3>
