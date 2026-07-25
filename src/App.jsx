@@ -35,6 +35,7 @@ import Videos from "./pages/aluno/Videos.jsx";
 import MinhaFicha from "./pages/aluno/MinhaFicha.jsx";
 import Perfil from "./pages/aluno/Perfil.jsx";
 import WorkoutMode from "./pages/aluno/WorkoutMode.jsx";
+import Configuracoes from "./pages/aluno/Configuracoes.jsx";
 
 import PersonalLogin from "./pages/personal/PersonalLogin.jsx";
 import PersonalLayout from "./pages/personal/PersonalLayout.jsx";
@@ -90,6 +91,7 @@ export default function App() {
         <Route path="/videos" element={<Videos />} />
         <Route path="/ficha" element={<MinhaFicha />} />
         <Route path="/perfil" element={<Perfil />} />
+        <Route path="/configuracoes" element={<Configuracoes />} />
       </Route>
 
       {/* PERSONAL */}

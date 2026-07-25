@@ -381,6 +381,29 @@ img { max-width: 100%; display: block; }
 .toast.success { border-color: var(--success); }
 .toast.error { border-color: #ef4444; }
 
+/* ============================================================
+   Configurações — linhas estilo lista (iOS/Apple)
+   ============================================================ */
+.config-group {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+.config-row {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; padding: 14px 16px; background: transparent;
+  border: none; border-bottom: 1px solid var(--border);
+  color: var(--text); font-size: 15px; font-weight: 500;
+  cursor: pointer; text-align: left;
+  transition: background .15s ease;
+}
+.config-row:last-child { border-bottom: none; }
+.config-row:hover { background: rgba(255,255,255,0.04); }
+[data-theme="branco"] .config-row:hover { background: rgba(0,0,0,0.04); }
+.config-row:active { transform: scale(0.99); }
+.config-row-left { display: flex; align-items: center; gap: 12px; }
+.config-row-left svg { color: var(--text-muted); }
+
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { opacity: 0; transform: translate(-50%, 20px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
