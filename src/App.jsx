@@ -36,6 +36,9 @@ import MinhaFicha from "./pages/aluno/MinhaFicha.jsx";
 import Perfil from "./pages/aluno/Perfil.jsx";
 import WorkoutMode from "./pages/aluno/WorkoutMode.jsx";
 import Configuracoes from "./pages/aluno/Configuracoes.jsx";
+import Historico from "./pages/aluno/Historico.jsx";
+import Evolucao from "./pages/aluno/Evolucao.jsx";
+import Favoritos from "./pages/aluno/Favoritos.jsx";
 
 import PersonalLogin from "./pages/personal/PersonalLogin.jsx";
 import PersonalLayout from "./pages/personal/PersonalLayout.jsx";
@@ -92,6 +95,9 @@ export default function App() {
         <Route path="/ficha" element={<MinhaFicha />} />
         <Route path="/perfil" element={<Perfil />} />
         <Route path="/configuracoes" element={<Configuracoes />} />
+        <Route path="/historico" element={<Historico />} />
+        <Route path="/evolucao" element={<Evolucao />} />
+        <Route path="/favoritos" element={<Favoritos />} />
       </Route>
 
       {/* PERSONAL */}

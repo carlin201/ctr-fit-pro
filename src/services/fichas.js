@@ -12,7 +12,10 @@
 //   updatedAt
 // }
 // ============================================================
-import { doc, getDoc, setDoc, deleteDoc, collection, getDocs } from "firebase/firestore";
+import {
+  doc, getDoc, setDoc, deleteDoc, collection, getDocs,
+  addDoc, query, orderBy, limit, serverTimestamp,
+} from "firebase/firestore";
 import { db } from "./firebase.js";
 
 export const DIAS = ["segunda", "terca", "quarta", "quinta", "sexta", "sabado", "domingo"];
@@ -33,11 +36,14 @@ export function fichaVazia() {
 }
 
 export async function salvarFicha(alunoId, ficha) {
-  await setDoc(
-    doc(db, "fichas", alunoId),
-    { ...ficha, alunoId, updatedAt: Date.now() },
-    { merge: false }
-  );
+  const payload = { ...ficha, alunoId, updatedAt: Date.now() };
+  await setDoc(doc(db, "fichas", alunoId), payload, { merge: false });
+  // Registra uma versão no histórico (não bloqueia se falhar)
+  try {
+    await addDoc(collection(db, "fichas_historico", alunoId, "versoes"), {
+      ...payload, criadoEm: serverTimestamp(),
+    });
+  } catch {}
 }
 
 export async function carregarFicha(alunoId) {
@@ -57,4 +63,29 @@ export async function deletarAluno(alunoId) {
 
 export async function deletarFicha(alunoId) {
   await deleteDoc(doc(db, "fichas", alunoId));
+}
+
+// Lista as versões antigas da ficha do aluno (ordenadas da mais recente para a mais antiga)
+export async function listarHistoricoFichas(alunoId, max = 20) {
+  try {
+    const q = query(
+      collection(db, "fichas_historico", alunoId, "versoes"),
+      orderBy("updatedAt", "desc"),
+      limit(max)
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  } catch {
+    return [];
+  }
+}
+
+// Lista as fichas mais recentes de todos os alunos (para o painel do personal)
+export async function listarFichas() {
+  try {
+    const snap = await getDocs(collection(db, "fichas"));
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  } catch {
+    return [];
+  }
 }
