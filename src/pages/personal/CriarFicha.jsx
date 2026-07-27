@@ -6,12 +6,13 @@
 //   3. Adicionar exercícios em cada dia da semana.
 //   4. Salvar / Gerar PDF / Enviar para o aluno / Apagar ficha.
 // ============================================================
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { listarAlunos, salvarFicha, carregarFicha, deletarFicha, fichaVazia, DIAS, DIAS_LABEL } from "../../services/fichas.js";
 import { gerarPDFFicha } from "../../services/pdf.js";
+import { CATEGORIAS } from "../../services/videos.js";
 import Toast from "../../components/Toast.jsx";
-import { Plus, Trash2, Save, Download, Send } from "lucide-react";
+import { Plus, Trash2, Save, Download, Send, Copy } from "lucide-react";
 
 export default function CriarFicha() {
   const [searchParams] = useSearchParams();
@@ -21,6 +22,9 @@ export default function CriarFicha() {
   const [fichaExiste, setFichaExiste] = useState(false);
   const [excluindoFicha, setExcluindoFicha] = useState(false);
   const [toast, setToast] = useState(null);
+  const [autosaveStatus, setAutosaveStatus] = useState("");
+  const autosaveTimer = useRef(null);
+  const firstLoad = useRef(true);
 
   useEffect(() => {
     listarAlunos().then((lista) => {
@@ -35,6 +39,7 @@ export default function CriarFicha() {
 
   const selecionarAluno = async (id, listaAlunos = alunos) => {
     setAlunoId(id);
+    firstLoad.current = true;
     if (!id) { setFicha(fichaVazia()); setFichaExiste(false); return; }
     const aluno = listaAlunos.find((a) => a.id === id);
     const existente = await carregarFicha(id);
@@ -53,11 +58,39 @@ export default function CriarFicha() {
     }
   };
 
+  // Autosave com debounce (2s) quando a ficha muda
+  useEffect(() => {
+    if (!alunoId) return;
+    if (firstLoad.current) { firstLoad.current = false; return; }
+    if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
+    setAutosaveStatus("Alterações não salvas...");
+    autosaveTimer.current = setTimeout(async () => {
+      try {
+        await salvarFicha(alunoId, ficha);
+        setFichaExiste(true);
+        setAutosaveStatus("Salvo automaticamente ✓");
+        setTimeout(() => setAutosaveStatus(""), 2500);
+      } catch {
+        setAutosaveStatus("Erro ao salvar");
+      }
+    }, 2000);
+    return () => autosaveTimer.current && clearTimeout(autosaveTimer.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ficha]);
+
   const setCampo = (k) => (e) => setFicha({ ...ficha, [k]: e.target.value });
 
   const addExercicio = (dia) => {
     const dias = { ...ficha.dias, [dia]: [...(ficha.dias[dia] || []), { nome: "", series: "3", reps: "12", descanso: "60s", obs: "" }] };
     setFicha({ ...ficha, dias });
+  };
+  const duplicarExercicio = (dia, i) => {
+    const arr = [...ficha.dias[dia]];
+    arr.splice(i + 1, 0, { ...arr[i] });
+    setFicha({ ...ficha, dias: { ...ficha.dias, [dia]: arr } });
+  };
+  const setCategoriaDia = (dia, cat) => {
+    setFicha({ ...ficha, categorias: { ...(ficha.categorias || {}), [dia]: cat } });
   };
   const removeExercicio = (dia, i) => {
     const dias = { ...ficha.dias, [dia]: ficha.dias[dia].filter((_, idx) => idx !== i) };
@@ -141,6 +174,14 @@ export default function CriarFicha() {
                 </button>
               </summary>
 
+              <div className="field" style={{ marginTop: 8 }}>
+                <label style={{ fontSize: 12 }}>Categoria do dia</label>
+                <select className="select" value={ficha.categorias?.[dia] || ""} onChange={(e) => setCategoriaDia(dia, e.target.value)}>
+                  <option value="">— sem categoria —</option>
+                  {CATEGORIAS.filter((c) => c !== "Todos").map((c) => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+
               {(ficha.dias[dia] || []).length === 0 && (
                 <p style={{ color: "var(--text-muted)", fontSize: 13 }}>Nenhum exercício. Clique em "Exercício" acima.</p>
               )}
@@ -152,6 +193,7 @@ export default function CriarFicha() {
                     <input className="input" placeholder="Séries" value={ex.series} onChange={(e) => updateExercicio(dia, i, "series", e.target.value)} />
                     <input className="input" placeholder="Reps" value={ex.reps} onChange={(e) => updateExercicio(dia, i, "reps", e.target.value)} />
                     <input className="input" placeholder="Desc." value={ex.descanso} onChange={(e) => updateExercicio(dia, i, "descanso", e.target.value)} />
+                    <button type="button" className="icon-btn" onClick={() => duplicarExercicio(dia, i)} aria-label="Duplicar"><Copy size={14}/></button>
                     <button type="button" className="icon-btn" onClick={() => removeExercicio(dia, i)} aria-label="Remover"><Trash2 size={14}/></button>
                   </div>
                   <input className="input" placeholder="Observações (opcional)" value={ex.obs} onChange={(e) => updateExercicio(dia, i, "obs", e.target.value)} />
@@ -161,6 +203,9 @@ export default function CriarFicha() {
           ))}
 
           {/* Ações finais */}
+          {autosaveStatus && (
+            <p style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 12 }}>{autosaveStatus}</p>
+          )}
           <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 20, maxWidth: 640 }}>
             <button className="btn btn-secondary" style={{ width: "auto" }} onClick={() => salvar()}><Save size={16}/> Salvar</button>
             <button className="btn btn-secondary" style={{ width: "auto" }} onClick={() => gerarPDFFicha(ficha)}><Download size={16}/> Gerar PDF</button>

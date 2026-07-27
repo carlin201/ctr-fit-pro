@@ -65,6 +65,22 @@ export async function deletarFicha(alunoId) {
   await deleteDoc(doc(db, "fichas", alunoId));
 }
 
+// Duplica a ficha de um aluno para outro aluno (copia estrutura, mantém dados do destino)
+export async function duplicarFicha(alunoOrigemId, alunoDestinoId) {
+  const origem = await carregarFicha(alunoOrigemId);
+  if (!origem) throw new Error("Ficha de origem não encontrada.");
+  const destino = await carregarFicha(alunoDestinoId);
+  const nova = {
+    ...origem,
+    nome: destino?.nome || origem.nome,
+    peso: destino?.peso || origem.peso,
+    altura: destino?.altura || origem.altura,
+    objetivo: destino?.objetivo || origem.objetivo,
+  };
+  await salvarFicha(alunoDestinoId, nova);
+  return nova;
+}
+
 // Lista as versões antigas da ficha do aluno (ordenadas da mais recente para a mais antiga)
 export async function listarHistoricoFichas(alunoId, max = 20) {
   try {
