@@ -4,7 +4,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { listarAlunos, deletarAluno } from "../../services/fichas.js";
-import { Search, Trash2, ClipboardEdit } from "lucide-react";
+import { Search, Trash2, ClipboardEdit, ArrowUpDown } from "lucide-react";
 
 export default function Alunos() {
   const nav = useNavigate();
@@ -12,13 +12,20 @@ export default function Alunos() {
   const [q, setQ] = useState("");
   const [sel, setSel] = useState(null);
   const [excluindo, setExcluindo] = useState(false);
+  const [ordem, setOrdem] = useState("nome");
 
   useEffect(() => { listarAlunos().then(setList).catch(() => setList([])); }, []);
 
-  const filtered = useMemo(
-    () => list.filter((a) => (a.nome || "").toLowerCase().includes(q.toLowerCase())),
-    [list, q]
-  );
+  const filtered = useMemo(() => {
+    const arr = list.filter((a) =>
+      (a.nome || "").toLowerCase().includes(q.toLowerCase()) ||
+      (a.email || "").toLowerCase().includes(q.toLowerCase())
+    );
+    if (ordem === "nome") arr.sort((a, b) => (a.nome || "").localeCompare(b.nome || ""));
+    if (ordem === "recente") arr.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    if (ordem === "objetivo") arr.sort((a, b) => (a.objetivo || "").localeCompare(b.objetivo || ""));
+    return arr;
+  }, [list, q, ordem]);
 
   const confirmarExclusao = async (aluno, e) => {
     e.stopPropagation();
@@ -46,10 +53,21 @@ export default function Alunos() {
     <div>
       <h1 style={{ fontSize: 32, fontWeight: 800, marginBottom: 24 }}>Alunos</h1>
 
-      <div className="field" style={{ position: "relative", maxWidth: 480 }}>
-        <Search size={18} style={{ position: "absolute", left: 14, top: 14, color: "var(--text-muted)" }} />
-        <input className="input" style={{ paddingLeft: 42 }} placeholder="Buscar aluno..." value={q} onChange={(e) => setQ(e.target.value)} />
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap", maxWidth: 640, marginBottom: 8 }}>
+        <div className="field" style={{ position: "relative", flex: 1, minWidth: 220, marginBottom: 0 }}>
+          <Search size={18} style={{ position: "absolute", left: 14, top: 14, color: "var(--text-muted)" }} />
+          <input className="input" style={{ paddingLeft: 42 }} placeholder="Buscar por nome ou e-mail..." value={q} onChange={(e) => setQ(e.target.value)} />
+        </div>
+        <div className="field" style={{ marginBottom: 0, minWidth: 180, position: "relative" }}>
+          <ArrowUpDown size={16} style={{ position: "absolute", left: 12, top: 15, color: "var(--text-muted)" }} />
+          <select className="select" style={{ paddingLeft: 38 }} value={ordem} onChange={(e) => setOrdem(e.target.value)}>
+            <option value="nome">Nome (A-Z)</option>
+            <option value="recente">Mais recentes</option>
+            <option value="objetivo">Objetivo</option>
+          </select>
+        </div>
       </div>
+      <p style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 16 }}>{filtered.length} aluno(s)</p>
 
       <div style={{ maxWidth: 640 }}>
         {filtered.length === 0 && <p style={{ color: "var(--text-muted)" }}>Nenhum aluno cadastrado.</p>}
