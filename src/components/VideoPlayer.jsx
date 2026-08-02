@@ -1,7 +1,10 @@
 // ============================================================
-// VideoPlayer.jsx — Modal com player HTML5 nativo (suporta tela cheia).
+// VideoPlayer.jsx — Modal com player do YouTube (iframe embed).
+// Se o vídeo não tiver youtubeId preenchido, mostra um card elegante
+// avisando que o vídeo ainda não está disponível.
 // ============================================================
-import { X } from "lucide-react";
+import { X, VideoOff } from "lucide-react";
+import { youtubeEmbedUrl, temVideo } from "../services/videos.js";
 
 export default function VideoPlayer({ video, onClose }) {
   if (!video) return null;
@@ -9,7 +12,22 @@ export default function VideoPlayer({ video, onClose }) {
     <div className="modal-overlay" onClick={onClose}>
       <button className="modal-close" onClick={onClose} aria-label="Fechar"><X /></button>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <video src={video.arquivo} controls autoPlay playsInline />
+        {temVideo(video) ? (
+          <div className="yt-frame">
+            <iframe
+              src={youtubeEmbedUrl(video.youtubeId, true)}
+              title={video.titulo}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              loading="lazy"
+            />
+          </div>
+        ) : (
+          <div className="video-unavailable">
+            <VideoOff size={28} />
+            <p>Vídeo ainda não disponível.</p>
+          </div>
+        )}
         <div className="modal-body">
           <span style={{ color: "var(--primary)", fontSize: 12, fontWeight: 600, textTransform: "uppercase" }}>
             {video.categoria}
