@@ -4,10 +4,10 @@
 // ============================================================
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { loadVideos, CATEGORIAS, carregarPreferenciasVideos, toggleFavoritoVideo, registrarVisualizacao } from "../../services/videos.js";
+import { loadVideos, CATEGORIAS, carregarPreferenciasVideos, toggleFavoritoVideo, registrarVisualizacao, youtubeThumb, temVideo, contarPorCategoria } from "../../services/videos.js";
 import { useAuth } from "../../services/AuthContext.jsx";
 import VideoPlayer from "../../components/VideoPlayer.jsx";
-import { Play, Search, Heart } from "lucide-react";
+import { Play, Search, Heart, ArrowDownAZ, VideoOff } from "lucide-react";
 
 export default function Videos() {
   const { user } = useAuth();
@@ -15,6 +15,7 @@ export default function Videos() {
   const [cat, setCat] = useState("Todos");
   const [q, setQ] = useState("");
   const [aba, setAba] = useState("todos"); // "todos" | "recentes" | "populares"
+  const [azOn, setAzOn] = useState(false); // ordenação A-Z
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
   const [prefs, setPrefs] = useState({ ids: [], visualizacoes: {}, recentes: [] });
@@ -40,8 +41,13 @@ export default function Videos() {
     } else if (aba === "populares") {
       base = [...base].sort((a, b) => (prefs.visualizacoes[b.id] || 0) - (prefs.visualizacoes[a.id] || 0));
     }
+    if (azOn) {
+      base = [...base].sort((a, b) => a.titulo.localeCompare(b.titulo, "pt-BR"));
+    }
     return base;
-  }, [all, cat, q, aba, prefs]);
+  }, [all, cat, q, aba, azOn, prefs]);
+
+  const contagens = useMemo(() => contarPorCategoria(all), [all]);
 
   const abrir = async (v) => {
     setSelected(v);
@@ -83,31 +89,51 @@ export default function Videos() {
         <button className={`chip ${aba === "todos" ? "active" : ""}`} onClick={() => setAba("todos")}>Todos</button>
         <button className={`chip ${aba === "recentes" ? "active" : ""}`} onClick={() => setAba("recentes")}>Recentes</button>
         <button className={`chip ${aba === "populares" ? "active" : ""}`} onClick={() => setAba("populares")}>Mais assistidos</button>
+        <button className={`chip ${azOn ? "active" : ""}`} onClick={() => setAzOn((v) => !v)} title="Ordenar A-Z">
+          <ArrowDownAZ size={14} style={{ verticalAlign: "-2px" }} /> A-Z
+        </button>
       </div>
 
       <div className="chip-row">
-        <button className={`chip ${cat === "Todos" ? "active" : ""}`} onClick={() => setCat("Todos")}>Todos</button>
+        <button className={`chip ${cat === "Todos" ? "active" : ""}`} onClick={() => setCat("Todos")}>Todos ({all.length})</button>
         {CATEGORIAS.map((c) => (
-          <button key={c} className={`chip ${cat === c ? "active" : ""}`} onClick={() => setCat(c)}>{c}</button>
+          <button key={c} className={`chip ${cat === c ? "active" : ""}`} onClick={() => setCat(c)}>
+            {c} ({contagens[c] || 0})
+          </button>
         ))}
       </div>
 
       {loading ? (
-        <p style={{ color: "var(--text-muted)" }}>Carregando vídeos...</p>
+        <div className="video-grid">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="video-card skeleton-card">
+              <div className="video-thumb skeleton" />
+              <div className="video-info">
+                <div className="skeleton skeleton-line" style={{ width: "80%" }} />
+                <div className="skeleton skeleton-line" style={{ width: "45%" }} />
+              </div>
+            </div>
+          ))}
+        </div>
       ) : filtered.length === 0 ? (
         <div className="card" style={{ textAlign: "center", padding: 40 }}>
           <p style={{ color: "var(--text-muted)" }}>
-            Nenhum vídeo encontrado. Adicione arquivos em <code>public/videos/</code> e registre em <code>videos.json</code>.
+            {q
+              ? <>Nenhum exercício encontrado para "<b>{q}</b>". Tente outro nome.</>
+              : <>Nenhum vídeo nesta lista. Registre os exercícios em <code>public/videos/videos.json</code> com o campo <code>youtubeId</code>.</>}
           </p>
         </div>
       ) : (
         <div className="video-grid">
           {filtered.map((v, i) => {
             const isFav = prefs.ids.includes(v.id);
+            const thumb = v.miniatura || youtubeThumb(v.youtubeId);
             return (
               <div key={i} className="video-card" onClick={() => abrir(v)}>
                 <div className="video-thumb">
-                  {v.miniatura ? <img src={v.miniatura} alt={v.titulo} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <Play fill="white" />}
+                  {thumb
+                    ? <img src={thumb} alt={v.titulo} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    : (temVideo(v) ? <Play fill="white" /> : <VideoOff size={22} />)}
                   <button className="fav-btn" onClick={(e) => favoritar(e, v)} aria-label="Favoritar" title="Favoritar">
                     <Heart size={16} fill={isFav ? "#ef4444" : "none"} color={isFav ? "#ef4444" : "white"} />
                   </button>
