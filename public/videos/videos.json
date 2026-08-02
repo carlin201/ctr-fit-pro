@@ -3,21 +3,21 @@
     "id": 1,
     "titulo": "Supino Reto",
     "categoria": "Peito",
-    "arquivo": "/videos/peito/supino-reto.mp4",
+    "youtubeId": "",
     "descricao": "Supino reto com barra."
   },
   {
     "id": 2,
     "titulo": "Crucifixo",
     "categoria": "Peito",
-    "arquivo": "/videos/peito/crucifixo.mp4",
+    "youtubeId": "",
     "descricao": "Crucifixo máquina."
   },
   {
     "id": 3,
     "titulo": "Levantamento Terra",
     "categoria": "Costas",
-    "arquivo": "/videos/costas/levantamento-terra.mp4",
+    "youtubeId": "",
     "descricao": "Levantamento terra."
   }
 ]

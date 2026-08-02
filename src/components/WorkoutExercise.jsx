@@ -8,15 +8,24 @@
 //   onConcluirSerie(index)
 // ============================================================
 import { Check } from "lucide-react";
+import { youtubeEmbedUrl, temVideo } from "../services/videos.js";
 
 export default function WorkoutExercise({ exercicio, video, seriesConcluidas, onConcluirSerie }) {
   if (!exercicio) return null;
 
   return (
     <div className="workout-exercise-card">
-      {video && (
+      {video && temVideo(video) && (
         <div className="workout-video">
-          <video src={video.arquivo} controls playsInline />
+          <div className="yt-frame">
+            <iframe
+              src={youtubeEmbedUrl(video.youtubeId)}
+              title={video.titulo}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              loading="lazy"
+            />
+          </div>
         </div>
       )}
 

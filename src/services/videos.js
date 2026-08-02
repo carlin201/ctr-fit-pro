@@ -29,6 +29,44 @@ export async function loadVideos() {
 }
 
 // ============================================================
+// Helpers de YouTube
+// ============================================================
+
+// Aceita ID puro ou uma URL completa do YouTube e devolve só o ID.
+export function extrairYoutubeId(valor = "") {
+  const v = String(valor).trim();
+  if (!v) return "";
+  const m = v.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([A-Za-z0-9_-]{6,})/);
+  return m ? m[1] : v;
+}
+
+// true quando o vídeo tem youtubeId preenchido.
+export function temVideo(video) {
+  return Boolean(extrairYoutubeId(video?.youtubeId));
+}
+
+// URL de embed do YouTube.
+export function youtubeEmbedUrl(youtubeId, autoplay = false) {
+  const id = extrairYoutubeId(youtubeId);
+  if (!id) return "";
+  return `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1${autoplay ? "&autoplay=1" : ""}`;
+}
+
+// Miniatura automática do YouTube (usada quando não há campo miniatura).
+export function youtubeThumb(youtubeId) {
+  const id = extrairYoutubeId(youtubeId);
+  return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : "";
+}
+
+// Contagem de exercícios por categoria.
+export function contarPorCategoria(videos = []) {
+  return videos.reduce((acc, v) => {
+    acc[v.categoria] = (acc[v.categoria] || 0) + 1;
+    return acc;
+  }, {});
+}
+
+// ============================================================
 // Favoritos e histórico de vídeos assistidos (Firestore + fallback local).
 // Coleção: favoritos_videos/{uid} -> { ids: [videoId], visualizacoes: {id:count}, recentes: [id...] }
 // ============================================================
