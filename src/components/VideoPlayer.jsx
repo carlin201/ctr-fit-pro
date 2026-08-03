@@ -4,7 +4,8 @@
 // avisando que o vídeo ainda não está disponível.
 // ============================================================
 import { X, VideoOff } from "lucide-react";
-import { youtubeEmbedUrl, temVideo } from "../services/videos.js";
+import { temVideo } from "../services/videos.js";
+import CleanYoutubePlayer from "./CleanYoutubePlayer.jsx";
 
 export default function VideoPlayer({ video, onClose }) {
   if (!video) return null;
@@ -13,15 +14,7 @@ export default function VideoPlayer({ video, onClose }) {
       <button className="modal-close" onClick={onClose} aria-label="Fechar"><X /></button>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         {temVideo(video) ? (
-          <div className="yt-frame">
-            <iframe
-              src={youtubeEmbedUrl(video.youtubeId, true)}
-              title={video.titulo}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-              loading="lazy"
-            />
-          </div>
+          <CleanYoutubePlayer youtubeId={video.youtubeId} title={video.titulo} />
         ) : (
           <div className="video-unavailable">
             <VideoOff size={28} />
