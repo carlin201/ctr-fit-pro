@@ -49,7 +49,21 @@ export function temVideo(video) {
 export function youtubeEmbedUrl(youtubeId, autoplay = false) {
   const id = extrairYoutubeId(youtubeId);
   if (!id) return "";
-  return `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1${autoplay ? "&autoplay=1" : ""}`;
+  // controls=0 + disablekb + iv_load_policy=3 + fs=0 => sem controles/UI do YouTube
+  const params = [
+    "rel=0",
+    "modestbranding=1",
+    "controls=0",
+    "disablekb=1",
+    "iv_load_policy=3",
+    "fs=0",
+    "playsinline=1",
+    "showinfo=0",
+    "loop=1",
+    `playlist=${id}`,
+  ];
+  if (autoplay) params.push("autoplay=1");
+  return `https://www.youtube.com/embed/${id}?${params.join("&")}`;
 }
 
 // Miniatura automática do YouTube (usada quando não há campo miniatura).
