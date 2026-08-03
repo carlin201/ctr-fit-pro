@@ -1,23 +1,149 @@
 [
   {
     "id": 1,
-    "titulo": "Supino Reto",
-    "categoria": "Peito",
-    "youtubeId": "",
-    "descricao": "Supino reto com barra."
+    "titulo": "Triceps frances com corda no crossover",
+    "categoria": "Triceps",
+    "youtubeId": "https://youtube.com/shorts/765ZpKzhGBI",
+    "descricao": "Triceps frances com corda no crossover"
   },
   {
     "id": 2,
-    "titulo": "Crucifixo",
-    "categoria": "Peito",
-    "youtubeId": "",
-    "descricao": "Crucifixo máquina."
+    "titulo": "Triceps testa com barra no crossover",
+    "categoria": "Triceps",
+    "youtubeId": "https://youtube.com/shorts/ZYYtCJ6VOUs",
+    "descricao": "Triceps testa com barra no crossover"
   },
   {
     "id": 3,
-    "titulo": "Levantamento Terra",
-    "categoria": "Costas",
-    "youtubeId": "",
-    "descricao": "Levantamento terra."
+    "titulo": "Elevação frontal halter",
+    "categoria": "Ombro",
+    "youtubeId": "https://youtube.com/shorts/hat1BfupO_M",
+    "descricao": "Elevação frontal halter"
+  },
+  {
+    "id": 4,
+    "titulo": "Posterior de ombro cruzado no crossover",
+    "categoria": "Ombro",
+    "youtubeId": "https://youtube.com/shorts/boaw4a5bDJM",
+    "descricao": "Posterior de ombro cruzado no crossover"
+  },
+  {
+    "id": 5,
+    "titulo": "Rosca direta com corda no crossover",
+    "categoria": "Biceps",
+    "youtubeId": "https://youtube.com/shorts/pOentklIaVU",
+    "descricao": "Rosca direta com corda no crossover"
+  },
+  {
+    "id": 6,
+    "titulo": "Rosca Direta com barra no crossover",
+    "categoria": "Biceps",
+    "youtubeId": "https://youtube.com/shorts/x_D-lJl5gD4",
+    "descricao": "Rosca direta com barra no crossover"
+  },
+  {
+    "id": 7,
+    "titulo": "Elevação lateral na máquina",
+    "categoria": "Ombro",
+    "youtubeId": "https://youtube.com/shorts/K7yIR5bbLMY",
+    "descricao": "Elevação lateral na máquina"
+  },
+  {
+    "id": 8,
+    "titulo": "Desenvolvimento frente articulado na máquina",
+    "categoria": "Ombro",
+    "youtubeId": "https://youtube.com/shorts/FWzXARxGSVE",
+    "descricao": "Desenvolvimento frente articulado na máquina"
+  },
+  {
+    "id": 9,
+    "titulo": "Elevação frontal corda no crossover",
+    "categoria": "Ombro",
+    "youtubeId": "https://youtube.com/shorts/WlNaoc353_0",
+    "descricao": "Elevação frontal corda no crossover"
+  },
+  {
+    "id": 10,
+    "titulo": "Remada alta com barra no crossover",
+    "categoria": "Ombro",
+    "youtubeId": "https://youtube.com/shorts/rifiBxtKcCs",
+    "descricao": "Remada alta com barra no crossover"
+  },
+  {
+    "id": 11,
+    "titulo": "Desenvolvimento frente no smith",
+    "categoria": "Ombro",
+    "youtubeId": "https://youtube.com/shorts/C2J4WVKsN_I",
+    "descricao": "Desenvolvimento frente no smith"
+  },
+  {
+    "id": 12,
+    "titulo": "Puxada alta arnold no crossover",
+    "categoria": "Biceps",
+    "youtubeId": "https://youtube.com/shorts/rclz65BHSEc",
+    "descricao": "Puxada alta arnold no crossover"
+  },
+  {
+    "id": 13,
+    "titulo": "Puxada alta arnold unilateral no crossover",
+    "categoria": "Biceps",
+    "youtubeId": "https://youtube.com/shorts/GGl8Jcq_UsU",
+    "descricao": "Puxada alta arnold unilateral no crossover"
+  },
+  {
+    "id": 14,
+    "titulo": "Rosca inversa com barra no crossover",
+    "categoria": "Biceps",
+    "youtubeId": "https://youtube.com/shorts/UAb2PBrEnr8",
+    "descricao": "Rosca inversa com barra no crossover"
+  },
+  {
+    "id": 15,
+    "titulo": "Rosca unilateral com halter",
+    "categoria": "Biceps",
+    "youtubeId": "https://youtube.com/shorts/fgxP-7M_qI8",
+    "descricao": "Rosca unilateral com halter"
+  },
+  {
+    "id": 16,
+    "titulo": "Rosca martelo com halter",
+    "categoria": "Biceps",
+    "youtubeId": "https://youtube.com/shorts/1ybmy6qI5dU",
+    "descricao": "rosca martelo com halter"
+  },
+  {
+    "id": 17,
+    "titulo": "Rosca direta com halter",
+    "categoria": "Biceps",
+    "youtubeId": "https://youtube.com/shorts/xAdUo1kAFHQ",
+    "descricao": "Rosca direta com halter"
+  },
+  {
+    "id": 18,
+    "titulo": "Rosca concentrada com halter",
+    "categoria": "Biceps",
+    "youtubeId": "https://youtube.com/shorts/X1Af5jgG8gM",
+    "descricao": "Rosca concentrada com halter"
+  },
+  {
+    "id": 19,
+    "titulo": "Banco scott",
+    "categoria": "Biceps",
+    "youtubeId": "https://youtube.com/shorts/y17HtJl8TJY",
+    "descricao": "Banco scott"
+  },
+  {
+    "id": 20,
+    "titulo": "Rosca direta com barra livre",
+    "categoria": "Biceps",
+    "youtubeId": "https://youtube.com/shorts/p1RZw7ZmIiI",
+    "descricao": "Rosca Direta Com barra livre"
+  },
+  {
+    "id": 21,
+    "titulo": "Flexão de punho com barra no crossover",
+    "categoria": "Biceps",
+    "youtubeId": "https://youtube.com/shorts/rOQmuqFtt0c",
+    "descricao": "Flexão de punho com barra no crossover"
   }
 ]
