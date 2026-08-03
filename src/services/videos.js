@@ -46,10 +46,11 @@ export function temVideo(video) {
 }
 
 // URL de embed do YouTube.
-export function youtubeEmbedUrl(youtubeId, autoplay = false) {
+export function youtubeEmbedUrl(youtubeId, autoplay = true) {
   const id = extrairYoutubeId(youtubeId);
   if (!id) return "";
-  // controls=0 + disablekb + iv_load_policy=3 + fs=0 => sem controles/UI do YouTube
+  // Sem nenhuma UI do YouTube: sem barras, sem botões, sem teclado, sem fullscreen.
+  // Autoplay mudo é necessário para iniciar o loop automaticamente e ocultar o play central.
   const params = [
     "rel=0",
     "modestbranding=1",
@@ -61,10 +62,12 @@ export function youtubeEmbedUrl(youtubeId, autoplay = false) {
     "showinfo=0",
     "loop=1",
     `playlist=${id}`,
+    "autoplay=1",
+    "mute=1",
   ];
-  if (autoplay) params.push("autoplay=1");
   return `https://www.youtube.com/embed/${id}?${params.join("&")}`;
 }
+
 
 // Miniatura automática do YouTube (usada quando não há campo miniatura).
 export function youtubeThumb(youtubeId) {
