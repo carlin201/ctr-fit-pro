@@ -7,6 +7,8 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../services/AuthContext.jsx";
 import { listarHistoricoFichas, DIAS, DIAS_LABEL, carregarFicha } from "../../services/fichas.js";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { loadVideos } from "../../services/videos.js";
+import { resolverExercicio } from "../../services/biblioteca.js";
 
 export default function Historico() {
   const { user } = useAuth();
@@ -88,6 +90,8 @@ export default function Historico() {
 }
 
 function DetalheFicha({ ficha, onVoltar }) {
+  const [biblioteca, setBiblioteca] = useState([]);
+  useEffect(() => { loadVideos().then(setBiblioteca).catch(() => setBiblioteca([])); }, []);
   const data = ficha.updatedAt ? new Date(ficha.updatedAt).toLocaleDateString("pt-BR") : "-";
   return (
     <div>
@@ -108,16 +112,20 @@ function DetalheFicha({ ficha, onVoltar }) {
         const exs = ficha.dias?.[d] || [];
         return (
           <div key={d} className="card dia-card">
-            <h3>{DIAS_LABEL[d]}</h3>
+            <h3>{DIAS_LABEL[d]}{ficha.categorias?.[d] ? ` • ${ficha.categorias[d]}` : ""}</h3>
             {exs.length === 0 ? (
               <p className="empty-day">Descanso</p>
-            ) : exs.map((ex, i) => (
-              <div key={i} className="exercicio">
-                <h4>{ex.nome}</h4>
-                <p>{ex.series} séries × {ex.reps} reps · Desc: {ex.descanso}</p>
-                {ex.obs && <p className="obs">{ex.obs}</p>}
-              </div>
-            ))}
+            ) : exs.map((item, i) => {
+              const ex = resolverExercicio(item, biblioteca);
+              return (
+                <div key={i} className="exercicio">
+                  <h4>{ex.nome}</h4>
+                  <p>{ex.series} séries × {ex.reps} reps · Desc: {ex.descanso}</p>
+                  {ex.carga && <p>Carga: {ex.carga}</p>}
+                  {ex.obs && <p className="obs">{ex.obs}</p>}
+                </div>
+              );
+            })}
           </div>
         );
       })}

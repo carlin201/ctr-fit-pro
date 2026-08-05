@@ -1,18 +1,38 @@
 // ============================================================
-// CriarFicha.jsx — Editor completo de ficha de treino.
+// CriarFicha.jsx — Editor de ficha de treino (modelo profissional).
 // Fluxo:
 //   1. Selecionar aluno (ou vir pré-selecionado via ?aluno=ID na URL).
 //   2. Preencher dados (nome, peso, altura, objetivo, professor).
-//   3. Adicionar exercícios em cada dia da semana.
-//   4. Salvar / Gerar PDF / Enviar para o aluno / Apagar ficha.
+//   3. Definir a categoria do treino de cada dia (ex: "Segunda • Peito").
+//   4. Adicionar exercícios pela Biblioteca de Exercícios (videos.json).
+//   5. Ajustar séries, reps, descanso, carga e observações.
+//   6. Autosave, PDF, envio ao aluno e exclusão da ficha.
+//
+// Na ficha salvamos apenas: exercicioId, series, reps, descanso, carga, obs.
+// Nome/categoria/vídeo vêm da Biblioteca automaticamente.
 // ============================================================
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { listarAlunos, salvarFicha, carregarFicha, deletarFicha, fichaVazia, DIAS, DIAS_LABEL } from "../../services/fichas.js";
 import { gerarPDFFicha } from "../../services/pdf.js";
-import { CATEGORIAS } from "../../services/videos.js";
+import {
+  carregarBiblioteca, resolverExercicio, CATEGORIAS_BIBLIOTECA,
+} from "../../services/biblioteca.js";
+import ExercisePicker from "../../components/ExercisePicker.jsx";
 import Toast from "../../components/Toast.jsx";
-import { Plus, Trash2, Save, Download, Send, Copy } from "lucide-react";
+import { Plus, Trash2, Save, Download, Send, Copy, GripVertical, PlayCircle, VideoOff, CopyPlus } from "lucide-react";
+
+// Categorias de treino do dia (biblioteca + combinações comuns)
+const CATEGORIAS_DIA = [
+  ...CATEGORIAS_BIBLIOTECA,
+  "Braços",
+  "Peito e Tríceps",
+  "Costas e Bíceps",
+  "Superiores",
+  "Inferiores",
+  "Full Body",
+  "Descanso",
+];
 
 export default function CriarFicha() {
   const [searchParams] = useSearchParams();
@@ -23,10 +43,14 @@ export default function CriarFicha() {
   const [excluindoFicha, setExcluindoFicha] = useState(false);
   const [toast, setToast] = useState(null);
   const [autosaveStatus, setAutosaveStatus] = useState("");
+  const [biblioteca, setBiblioteca] = useState([]);
+  const [pickerDia, setPickerDia] = useState(null);
+  const [drag, setDrag] = useState(null); // { dia, index }
   const autosaveTimer = useRef(null);
   const firstLoad = useRef(true);
 
   useEffect(() => {
+    carregarBiblioteca().then(setBiblioteca).catch(() => setBiblioteca([]));
     listarAlunos().then((lista) => {
       setAlunos(lista);
       const alunoPreSelecionado = searchParams.get("aluno");
@@ -80,26 +104,60 @@ export default function CriarFicha() {
 
   const setCampo = (k) => (e) => setFicha({ ...ficha, [k]: e.target.value });
 
-  const addExercicio = (dia) => {
-    const dias = { ...ficha.dias, [dia]: [...(ficha.dias[dia] || []), { nome: "", series: "3", reps: "12", descanso: "60s", obs: "" }] };
-    setFicha({ ...ficha, dias });
+  const setDia = (dia, arr) => setFicha((f) => ({ ...f, dias: { ...f.dias, [dia]: arr } }));
+
+  // Adiciona um exercício escolhido na Biblioteca
+  const adicionarDaBiblioteca = (dia, exercicio) => {
+    const novo = {
+      exercicioId: exercicio.id,
+      series: "4",
+      reps: "10",
+      descanso: "60s",
+      carga: "",
+      obs: "",
+    };
+    setDia(dia, [...(ficha.dias[dia] || []), novo]);
   };
+
   const duplicarExercicio = (dia, i) => {
-    const arr = [...ficha.dias[dia]];
+    const arr = [...(ficha.dias[dia] || [])];
     arr.splice(i + 1, 0, { ...arr[i] });
-    setFicha({ ...ficha, dias: { ...ficha.dias, [dia]: arr } });
+    setDia(dia, arr);
   };
+
+  const removeExercicio = (dia, i) => {
+    setDia(dia, (ficha.dias[dia] || []).filter((_, idx) => idx !== i));
+  };
+
+  const updateExercicio = (dia, i, k, v) => {
+    const arr = [...(ficha.dias[dia] || [])];
+    arr[i] = { ...arr[i], [k]: v };
+    setDia(dia, arr);
+  };
+
   const setCategoriaDia = (dia, cat) => {
     setFicha({ ...ficha, categorias: { ...(ficha.categorias || {}), [dia]: cat } });
   };
-  const removeExercicio = (dia, i) => {
-    const dias = { ...ficha.dias, [dia]: ficha.dias[dia].filter((_, idx) => idx !== i) };
-    setFicha({ ...ficha, dias });
+
+  // Duplica o dia completo (exercícios + categoria) para outro dia
+  const duplicarDia = (dia, destino) => {
+    if (!destino) return;
+    setFicha((f) => ({
+      ...f,
+      dias: { ...f.dias, [destino]: (f.dias[dia] || []).map((e) => ({ ...e })) },
+      categorias: { ...(f.categorias || {}), [destino]: (f.categorias || {})[dia] || "" },
+    }));
+    setToast({ type: "success", msg: `Treino copiado para ${DIAS_LABEL[destino]}.` });
   };
-  const updateExercicio = (dia, i, k, v) => {
-    const arr = [...ficha.dias[dia]];
-    arr[i] = { ...arr[i], [k]: v };
-    setFicha({ ...ficha, dias: { ...ficha.dias, [dia]: arr } });
+
+  // --- Drag and drop para reordenar exercícios ---
+  const onDrop = (dia, index) => {
+    if (!drag || drag.dia !== dia || drag.index === index) return setDrag(null);
+    const arr = [...(ficha.dias[dia] || [])];
+    const [movido] = arr.splice(drag.index, 1);
+    arr.splice(index, 0, movido);
+    setDia(dia, arr);
+    setDrag(null);
   };
 
   const salvar = async (mostrar = "Ficha salva!") => {
@@ -117,7 +175,6 @@ export default function CriarFicha() {
     if (!alunoId) return;
     const confirmar = window.confirm("Tem certeza que deseja apagar esta ficha? Essa ação não pode ser desfeita.");
     if (!confirmar) return;
-
     setExcluindoFicha(true);
     try {
       await deletarFicha(alunoId);
@@ -130,6 +187,11 @@ export default function CriarFicha() {
       setExcluindoFicha(false);
     }
   };
+
+  const totalExercicios = useMemo(
+    () => DIAS.reduce((s, d) => s + (ficha.dias?.[d]?.length || 0), 0),
+    [ficha]
+  );
 
   return (
     <div>
@@ -157,50 +219,122 @@ export default function CriarFicha() {
             </div>
             <div className="field"><label>Objetivo</label><input className="input" value={ficha.objetivo} onChange={setCampo("objetivo")} /></div>
             <div className="field"><label>Professor</label><input className="input" value={ficha.professor} onChange={setCampo("professor")} /></div>
+            <p style={{ color: "var(--text-muted)", fontSize: 13 }}>{totalExercicios} exercícios na ficha</p>
           </div>
 
           {/* Dias da semana */}
-          {DIAS.map((dia) => (
-            <details key={dia} className="dia-editor" open>
-              <summary>
-                <span>{DIAS_LABEL[dia]} <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>({ficha.dias[dia]?.length || 0} exercícios)</span></span>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  style={{ width: "auto", padding: "8px 12px", fontSize: 13 }}
-                  onClick={(e) => { e.preventDefault(); addExercicio(dia); }}
-                >
-                  <Plus size={14}/> Exercício
-                </button>
-              </summary>
+          {DIAS.map((dia) => {
+            const lista = ficha.dias[dia] || [];
+            const catDia = ficha.categorias?.[dia] || "";
+            return (
+              <details key={dia} className="dia-editor" open>
+                <summary>
+                  <span>
+                    {DIAS_LABEL[dia]}{catDia ? ` • ${catDia}` : ""}
+                    <span style={{ color: "var(--text-muted)", fontWeight: 400 }}> ({lista.length} exercícios)</span>
+                  </span>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    style={{ width: "auto", padding: "8px 12px", fontSize: 13 }}
+                    onClick={(e) => { e.preventDefault(); setPickerDia(dia); }}
+                  >
+                    <Plus size={14}/> Adicionar Exercício
+                  </button>
+                </summary>
 
-              <div className="field" style={{ marginTop: 8 }}>
-                <label style={{ fontSize: 12 }}>Categoria do dia</label>
-                <select className="select" value={ficha.categorias?.[dia] || ""} onChange={(e) => setCategoriaDia(dia, e.target.value)}>
-                  <option value="">— sem categoria —</option>
-                  {CATEGORIAS.filter((c) => c !== "Todos").map((c) => <option key={c} value={c}>{c}</option>)}
-                </select>
-              </div>
-
-              {(ficha.dias[dia] || []).length === 0 && (
-                <p style={{ color: "var(--text-muted)", fontSize: 13 }}>Nenhum exercício. Clique em "Exercício" acima.</p>
-              )}
-
-              {(ficha.dias[dia] || []).map((ex, i) => (
-                <div key={i} style={{ marginBottom: 12, padding: 12, background: "var(--bg-elev)", borderRadius: 10 }}>
-                  <div className="ex-row">
-                    <input className="input" placeholder="Nome do exercício" value={ex.nome} onChange={(e) => updateExercicio(dia, i, "nome", e.target.value)} />
-                    <input className="input" placeholder="Séries" value={ex.series} onChange={(e) => updateExercicio(dia, i, "series", e.target.value)} />
-                    <input className="input" placeholder="Reps" value={ex.reps} onChange={(e) => updateExercicio(dia, i, "reps", e.target.value)} />
-                    <input className="input" placeholder="Desc." value={ex.descanso} onChange={(e) => updateExercicio(dia, i, "descanso", e.target.value)} />
-                    <button type="button" className="icon-btn" onClick={() => duplicarExercicio(dia, i)} aria-label="Duplicar"><Copy size={14}/></button>
-                    <button type="button" className="icon-btn" onClick={() => removeExercicio(dia, i)} aria-label="Remover"><Trash2 size={14}/></button>
+                <div className="dia-config">
+                  <div className="field" style={{ marginBottom: 0 }}>
+                    <label style={{ fontSize: 12 }}>Categoria do treino</label>
+                    <select className="select" value={catDia} onChange={(e) => setCategoriaDia(dia, e.target.value)}>
+                      <option value="">— sem categoria —</option>
+                      {CATEGORIAS_DIA.map((c) => <option key={c} value={c}>{c}</option>)}
+                    </select>
                   </div>
-                  <input className="input" placeholder="Observações (opcional)" value={ex.obs} onChange={(e) => updateExercicio(dia, i, "obs", e.target.value)} />
+                  <div className="field" style={{ marginBottom: 0 }}>
+                    <label style={{ fontSize: 12 }}>Duplicar este dia para</label>
+                    <select className="select" value="" onChange={(e) => { duplicarDia(dia, e.target.value); e.target.value = ""; }}>
+                      <option value="">— escolher dia —</option>
+                      {DIAS.filter((d) => d !== dia).map((d) => <option key={d} value={d}>{DIAS_LABEL[d]}</option>)}
+                    </select>
+                  </div>
                 </div>
-              ))}
-            </details>
-          ))}
+
+                {lista.length === 0 && (
+                  <p style={{ color: "var(--text-muted)", fontSize: 13 }}>
+                    Nenhum exercício. Clique em "Adicionar Exercício" para escolher na biblioteca.
+                  </p>
+                )}
+
+                {lista.map((item, i) => {
+                  const ex = resolverExercicio(item, biblioteca);
+                  return (
+                    <div
+                      key={i}
+                      className={`ex-card ${drag?.dia === dia && drag?.index === i ? "dragging" : ""}`}
+                      draggable
+                      onDragStart={() => setDrag({ dia, index: i })}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={() => onDrop(dia, i)}
+                      onDragEnd={() => setDrag(null)}
+                    >
+                      <div className="ex-card-head">
+                        <span className="ex-drag" title="Arraste para reordenar"><GripVertical size={16} /></span>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <b className="ex-nome">{ex.nome}</b>
+                          <div className="ex-meta">
+                            {ex.categoria && <span className="picker-tag">{ex.categoria}</span>}
+                            {ex.temVideo
+                              ? <span className="ex-video ok"><PlayCircle size={13}/> vídeo</span>
+                              : <span className="ex-video"><VideoOff size={13}/> sem vídeo</span>}
+                          </div>
+                        </div>
+                        <button type="button" className="icon-btn" onClick={() => duplicarExercicio(dia, i)} aria-label="Duplicar"><Copy size={14}/></button>
+                        <button type="button" className="icon-btn" onClick={() => removeExercicio(dia, i)} aria-label="Remover"><Trash2 size={14}/></button>
+                      </div>
+
+                      <div className="ex-grid">
+                        <div className="field" style={{ marginBottom: 0 }}>
+                          <label style={{ fontSize: 11 }}>Séries</label>
+                          <input className="input" value={item.series || ""} onChange={(e) => updateExercicio(dia, i, "series", e.target.value)} />
+                        </div>
+                        <div className="field" style={{ marginBottom: 0 }}>
+                          <label style={{ fontSize: 11 }}>Repetições</label>
+                          <input className="input" value={item.reps || ""} onChange={(e) => updateExercicio(dia, i, "reps", e.target.value)} />
+                        </div>
+                        <div className="field" style={{ marginBottom: 0 }}>
+                          <label style={{ fontSize: 11 }}>Descanso</label>
+                          <input className="input" value={item.descanso || ""} onChange={(e) => updateExercicio(dia, i, "descanso", e.target.value)} />
+                        </div>
+                        <div className="field" style={{ marginBottom: 0 }}>
+                          <label style={{ fontSize: 11 }}>Carga (opcional)</label>
+                          <input className="input" placeholder="ex: 40kg" value={item.carga || ""} onChange={(e) => updateExercicio(dia, i, "carga", e.target.value)} />
+                        </div>
+                      </div>
+                      <input
+                        className="input"
+                        style={{ marginTop: 8 }}
+                        placeholder="Observações (opcional)"
+                        value={item.obs || ""}
+                        onChange={(e) => updateExercicio(dia, i, "obs", e.target.value)}
+                      />
+                    </div>
+                  );
+                })}
+
+                {lista.length > 0 && (
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    style={{ width: "auto", padding: "8px 12px", fontSize: 13, marginTop: 4 }}
+                    onClick={() => setPickerDia(dia)}
+                  >
+                    <CopyPlus size={14}/> Adicionar outro exercício
+                  </button>
+                )}
+              </details>
+            );
+          })}
 
           {/* Ações finais */}
           {autosaveStatus && (
@@ -208,7 +342,7 @@ export default function CriarFicha() {
           )}
           <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 20, maxWidth: 640 }}>
             <button className="btn btn-secondary" style={{ width: "auto" }} onClick={() => salvar()}><Save size={16}/> Salvar</button>
-            <button className="btn btn-secondary" style={{ width: "auto" }} onClick={() => gerarPDFFicha(ficha)}><Download size={16}/> Gerar PDF</button>
+            <button className="btn btn-secondary" style={{ width: "auto" }} onClick={() => gerarPDFFicha(ficha, biblioteca)}><Download size={16}/> Gerar PDF</button>
             <button className="btn btn-primary" style={{ width: "auto" }} onClick={() => salvar("Ficha enviada para o aluno!")}><Send size={16}/> Enviar para o aluno</button>
             {fichaExiste && (
               <button
@@ -223,6 +357,14 @@ export default function CriarFicha() {
           </div>
         </>
       )}
+
+      <ExercisePicker
+        aberto={Boolean(pickerDia)}
+        biblioteca={biblioteca}
+        categoriaInicial={pickerDia ? (ficha.categorias?.[pickerDia] || "") : ""}
+        onSelecionar={(ex) => adicionarDaBiblioteca(pickerDia, ex)}
+        onClose={() => setPickerDia(null)}
+      />
 
       <Toast toast={toast} onClose={() => setToast(null)} />
     </div>

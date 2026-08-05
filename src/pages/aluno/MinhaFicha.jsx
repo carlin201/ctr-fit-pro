@@ -10,6 +10,7 @@ import { carregarFicha, DIAS, DIAS_LABEL } from "../../services/fichas.js";
 import { gerarPDFFicha } from "../../services/pdf.js";
 import { diaDaSemanaAtual, encontrarVideoDoExercicio } from "../../services/workout.js";
 import { loadVideos } from "../../services/videos.js";
+import { resolverExercicio } from "../../services/biblioteca.js";
 import VideoPlayer from "../../components/VideoPlayer.jsx";
 import { Download, Share2, Play, History, Eye } from "lucide-react";
 
@@ -49,8 +50,12 @@ export default function MinhaFicha() {
     DIAS.forEach((d) => {
       const exs = ficha.dias?.[d] || [];
       if (!exs.length) return;
-      txt += `*${DIAS_LABEL[d]}*\n`;
-      exs.forEach((e, i) => { txt += `${i + 1}. ${e.nome} — ${e.series}x${e.reps} (${e.descanso})\n`; });
+      const cat = ficha.categorias?.[d];
+      txt += `*${DIAS_LABEL[d]}${cat ? ` • ${cat}` : ""}*\n`;
+      exs.forEach((item, i) => {
+        const e = resolverExercicio(item, videos);
+        txt += `${i + 1}. ${e.nome} — ${e.series}x${e.reps} (${e.descanso})${e.carga ? ` · ${e.carga}` : ""}\n`;
+      });
       txt += "\n";
     });
     const url = `https://wa.me/?text=${encodeURIComponent(txt)}`;
@@ -94,7 +99,7 @@ export default function MinhaFicha() {
       )}
 
       <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
-        <button className="btn btn-secondary" onClick={() => gerarPDFFicha(ficha)}><Download size={16}/> PDF</button>
+        <button className="btn btn-secondary" onClick={() => gerarPDFFicha(ficha, videos)}><Download size={16}/> PDF</button>
         <button className="btn btn-secondary" onClick={compartilhar}><Share2 size={16}/> WhatsApp</button>
       </div>
 
@@ -103,32 +108,36 @@ export default function MinhaFicha() {
         const categoria = ficha.categorias?.[d];
         return (
           <div key={d} className="card dia-card">
-            <h3>
+            <h3 style={{ textTransform: "uppercase", letterSpacing: 0.5 }}>
               {DIAS_LABEL[d]}
-              {categoria && <span style={{ marginLeft: 8, fontSize: 12, color: "var(--text-muted)", fontWeight: 500 }}>· {categoria}</span>}
+              {categoria && <span style={{ marginLeft: 6, color: "var(--primary)" }}>• {categoria}</span>}
             </h3>
             {exs.length === 0 ? (
               <p className="empty-day">Descanso</p>
-            ) : exs.map((ex, i) => {
-              const video = encontrarVideoDoExercicio(videos, ex.nome);
+            ) : exs.map((item, i) => {
+              const ex = resolverExercicio(item, videos);
+              const video = ex.temVideo
+                ? { titulo: ex.nome, youtubeId: ex.youtubeId, descricao: ex.descricao, categoria: ex.categoria }
+                : encontrarVideoDoExercicio(videos, ex.nome);
               return (
-                <div key={i} className="exercicio">
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
-                    <div style={{ flex: 1 }}>
+                <div key={i} className="exercicio ficha-ex">
+                  <div className="ficha-ex-top">
+                    <div style={{ flex: 1, minWidth: 0 }}>
                       <h4>{ex.nome}</h4>
-                      <p>{ex.series} séries × {ex.reps} reps · Desc: {ex.descanso}</p>
+                      <p className="ficha-ex-serie">{ex.series}x{ex.reps}</p>
+                      <p>Descanso: {ex.descanso}</p>
+                      {ex.carga && <p>Carga: {ex.carga}</p>}
                       {ex.obs && <p className="obs">{ex.obs}</p>}
                     </div>
-                    {video && (
-                      <button
-                        className="btn btn-secondary"
-                        style={{ width: "auto", padding: "8px 12px", fontSize: 12 }}
-                        onClick={() => setVideoAberto(video)}
-                      >
-                        <Eye size={14} /> Assistir
-                      </button>
-                    )}
                   </div>
+                  {video && (
+                    <button
+                      className="btn btn-secondary ficha-ex-video"
+                      onClick={() => setVideoAberto(video)}
+                    >
+                      <Play size={14} /> Assistir Execução
+                    </button>
+                  )}
                 </div>
               );
             })}
