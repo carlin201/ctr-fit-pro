@@ -14,13 +14,13 @@ import CleanYoutubePlayer from "./CleanYoutubePlayer.jsx";
 
 export default function ExercisePicker({ aberto, biblioteca = [], categoriaInicial = "", onSelecionar, onClose }) {
   const [busca, setBusca] = useState("");
-  const [categoria, setCategoria] = useState(categoriaInicial || "");
+  const [categoria, setCategoria] = useState("");
   const [preview, setPreview] = useState(null);
 
   useEffect(() => {
     if (aberto) {
       setBusca("");
-      setCategoria(categoriaInicial || "");
+      setCategoria(CATEGORIAS_BIBLIOTECA.includes(categoriaInicial) ? categoriaInicial : "");
       setPreview(null);
     }
   }, [aberto, categoriaInicial]);

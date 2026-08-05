@@ -4,8 +4,9 @@
 // ============================================================
 import jsPDF from "jspdf";
 import { DIAS, DIAS_LABEL } from "./fichas.js";
+import { resolverExercicio } from "./biblioteca.js";
 
-export function gerarPDFFicha(ficha) {
+export function gerarPDFFicha(ficha, biblioteca = []) {
   const pdf = new jsPDF();
   const margin = 15;
   let y = margin;
@@ -28,12 +29,15 @@ export function gerarPDFFicha(ficha) {
     if (y > 260) { pdf.addPage(); y = margin; }
     pdf.setFontSize(14);
     pdf.setTextColor(220, 38, 38);
-    pdf.text(DIAS_LABEL[dia], margin, y); y += 7;
+    const catDia = ficha.categorias?.[dia];
+    pdf.text(DIAS_LABEL[dia] + (catDia ? ` - ${catDia}` : ""), margin, y); y += 7;
     pdf.setFontSize(10);
     pdf.setTextColor(0, 0, 0);
-    exs.forEach((ex, i) => {
+    exs.forEach((item, i) => {
+      const ex = resolverExercicio(item, biblioteca);
       if (y > 275) { pdf.addPage(); y = margin; }
-      pdf.text(`${i + 1}. ${ex.nome} — ${ex.series}x${ex.reps} | Desc: ${ex.descanso}`, margin, y);
+      const carga = ex.carga ? ` | Carga: ${ex.carga}` : "";
+      pdf.text(`${i + 1}. ${ex.nome} — ${ex.series}x${ex.reps} | Desc: ${ex.descanso}${carga}`, margin, y);
       y += 5;
       if (ex.obs) { pdf.text(`   Obs: ${ex.obs}`, margin, y); y += 5; }
     });
