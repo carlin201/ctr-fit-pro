@@ -43,8 +43,8 @@ export default function WorkoutMode() {
     (async () => {
       const ficha = await carregarFicha(user.uid);
       const dia = diaDaSemanaAtual();
-      const lista = exerciciosDoDia(ficha, dia);
       const todosVideos = await loadVideos();
+      const lista = exerciciosDoDia(ficha, dia, todosVideos);
 
       setExercicios(lista);
       setVideos(todosVideos);

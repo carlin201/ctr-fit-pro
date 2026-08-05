@@ -3,15 +3,19 @@
 // Não mexe em Firebase/Firestore diretamente (isso fica em fichas.js
 // e AuthContext.jsx), só organiza dados para a tela de treino.
 // ============================================================
+import { resolverExercicio } from "./biblioteca.js";
 
 // Transforma o objeto `dias` da ficha numa lista plana de exercícios
 // do dia informado, já numerados.
-export function exerciciosDoDia(ficha, dia) {
-  return (ficha?.dias?.[dia] || []).map((ex, i) => ({
+export function exerciciosDoDia(ficha, dia, biblioteca = []) {
+  return (ficha?.dias?.[dia] || []).map((item, i) => {
+    const ex = resolverExercicio(item, biblioteca);
+    return {
     ...ex,
     _index: i,
     seriesTotais: parseInt(ex.series, 10) || 0,
-  }));
+    };
+  });
 }
 
 // Normaliza texto para comparar nomes sem se importar com
