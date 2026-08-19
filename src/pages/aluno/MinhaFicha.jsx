@@ -3,16 +3,19 @@
 // Carrega automaticamente a ficha enviada pelo personal.
 // Permite baixar PDF, compartilhar no WhatsApp e iniciar o Modo Treino.
 // ============================================================
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../services/AuthContext.jsx";
-import { carregarFicha, DIAS, DIAS_LABEL } from "../../services/fichas.js";
+import { carregarFicha, DIAS, DIAS_LABEL, diasOrdenados, nomeDoDia } from "../../services/fichas.js";
 import { gerarPDFFicha } from "../../services/pdf.js";
-import { diaDaSemanaAtual, encontrarVideoDoExercicio } from "../../services/workout.js";
+import {
+  diaDaSemanaAtual, encontrarVideoDoExercicio,
+  carregarConcluidos, salvarConcluidos,
+} from "../../services/workout.js";
 import { loadVideos } from "../../services/videos.js";
 import { resolverExercicio } from "../../services/biblioteca.js";
 import VideoPlayer from "../../components/VideoPlayer.jsx";
-import { Download, Share2, Play, History, Eye } from "lucide-react";
+import { Download, Share2, Play, History, Check } from "lucide-react";
 
 export default function MinhaFicha() {
   const { user } = useAuth();
@@ -21,12 +24,18 @@ export default function MinhaFicha() {
   const [loading, setLoading] = useState(true);
   const [videos, setVideos] = useState([]);
   const [videoAberto, setVideoAberto] = useState(null);
+  const [diaAtivo, setDiaAtivo] = useState(diaDaSemanaAtual());
+  const [concluidos, setConcluidos] = useState([]);
 
   useEffect(() => {
     if (!user) return;
     carregarFicha(user.uid).then((f) => { setFicha(f); setLoading(false); });
     loadVideos().then(setVideos);
   }, [user]);
+
+  useEffect(() => {
+    if (user?.uid) setConcluidos(carregarConcluidos(user.uid, diaAtivo));
+  }, [user?.uid, diaAtivo]);
 
   if (loading) return <p style={{ color: "var(--text-muted)" }}>Carregando ficha...</p>;
 
