@@ -337,23 +337,51 @@
   },
   {
     "id": 49,
-    "titulo": "",
-    "categoria": "Mobilidade",
-    "youtubeId": "",
-    "descricao": ""
+    "titulo": "Puxada alta articulada unilateral",
+    "categoria": "Costas",
+    "youtubeId": "https://youtube.com/shorts/fnSpmq8BDS4",
+    "descricao": "Puxada alta articulada unilateral"
   },
   {
     "id": 50,
-    "titulo": "",
-    "categoria": "Mobilidade",
-    "youtubeId": "",
-    "descricao": ""
+    "titulo": "Remada baixa aberta com barra",
+    "categoria": "Costas",
+    "youtubeId": "https://youtube.com/shorts/zfVCK65RJHk",
+    "descricao": "Remada baixa aberta com barra"
   },
   {
     "id": 51,
-    "titulo": "",
-    "categoria": "Mobilidade",
-    "youtubeId": "",
-    "descricao": ""
+    "titulo": "Remada baixa com triângulo",
+    "categoria": "Costas",
+    "youtubeId": "https://youtube.com/shorts/bNR_rSXEcho",
+    "descricao": "Remada baixa com triângulo"
+  },
+  {
+    "id": 52,
+    "titulo": "Puxada aberta com barra",
+    "categoria": "Costas",
+    "youtubeId": "https://youtube.com/shorts/8f4Fzxtqbkg",
+    "descricao": "Puxada aberta com barra"
+  },
+  {
+    "id": 53,
+    "titulo": "Puxada fechada com triângulo",
+    "categoria": "Costas",
+    "youtubeId": "https://youtube.com/shorts/x9ZM3P2YRag",
+    "descricao": "Puxada fechada com triângulo"
+  },
+  {
+    "id": 54,
+    "titulo": "Puxada frente fechada com barra",
+    "categoria": "Costas",
+    "youtubeId": "https://youtube.com/shorts/OgXEQGhko4A",
+    "descricao": "Puxada frente fechada com barra"
+  },
+  {
+    "id": 55,
+    "titulo": "Puxada frente com barra",
+    "categoria": "Costas",
+    "youtubeId": "https://youtube.com/shorts/IN-lN3XRzts",
+    "descricao": "Puxada frente com barra"
   }
 ]
