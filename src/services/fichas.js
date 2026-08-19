@@ -32,7 +32,34 @@ export const DIAS_LABEL = {
 export function fichaVazia() {
   const dias = {};
   DIAS.forEach((d) => (dias[d] = []));
-  return { nome: "", peso: "", altura: "", objetivo: "", professor: "", dias };
+  const nomesDias = {};
+  DIAS.forEach((d) => (nomesDias[d] = ""));
+  return {
+    nome: "", peso: "", altura: "", objetivo: "", professor: "",
+    dias,
+    categorias: {},
+    nomesDias,          // nome personalizado do dia (ex: "Treino A", "Push")
+    ordemDias: [...DIAS], // ordem em que os dias aparecem
+  };
+}
+
+// Ordem dos dias da ficha (compatível com fichas antigas sem `ordemDias`).
+export function diasOrdenados(ficha) {
+  const salvos = Array.isArray(ficha?.ordemDias) ? ficha.ordemDias.filter((d) => DIAS.includes(d)) : [];
+  const faltando = DIAS.filter((d) => !salvos.includes(d));
+  return [...salvos, ...faltando];
+}
+
+// Nome exibido de um dia: usa o nome personalizado quando existir.
+export function nomeDoDia(ficha, dia) {
+  const custom = String(ficha?.nomesDias?.[dia] || "").trim();
+  return custom || DIAS_LABEL[dia] || dia;
+}
+
+// Rótulo completo do dia: "Segunda • Peito"
+export function rotuloDoDia(ficha, dia) {
+  const cat = String(ficha?.categorias?.[dia] || "").trim();
+  return `${nomeDoDia(ficha, dia)}${cat ? ` • ${cat}` : ""}`;
 }
 
 export async function salvarFicha(alunoId, ficha) {
