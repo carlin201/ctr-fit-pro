@@ -3,7 +3,7 @@
 // Carrega automaticamente a ficha enviada pelo personal.
 // Permite baixar PDF, compartilhar no WhatsApp e iniciar o Modo Treino.
 // ============================================================
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../services/AuthContext.jsx";
 import { carregarFicha, DIAS, DIAS_LABEL, diasOrdenados, nomeDoDia } from "../../services/fichas.js";
@@ -69,6 +69,17 @@ export default function MinhaFicha() {
     });
     const url = `https://wa.me/?text=${encodeURIComponent(txt)}`;
     window.open(url, "_blank");
+  };
+
+  const ordem = diasOrdenados(ficha);
+  const listaDia = ficha.dias?.[diaAtivo] || [];
+  const feitos = listaDia.filter((_, i) => concluidos.includes(i)).length;
+  const percentual = listaDia.length ? Math.round((feitos / listaDia.length) * 100) : 0;
+
+  const alternarConcluido = (i) => {
+    const novo = concluidos.includes(i) ? concluidos.filter((x) => x !== i) : [...concluidos, i];
+    setConcluidos(novo);
+    if (user?.uid) salvarConcluidos(user.uid, diaAtivo, novo);
   };
 
   return (
