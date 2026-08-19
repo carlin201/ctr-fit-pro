@@ -27,7 +27,7 @@ function carregarYoutubeApi() {
   return youtubeApiPromise;
 }
 
-export default function CleanYoutubePlayer({ youtubeId, title }) {
+export default function CleanYoutubePlayer({ youtubeId, title, onReady }) {
   const id = extrairYoutubeId(youtubeId);
   const reactId = useId().replace(/:/g, "");
   const playerId = `ctr-youtube-${reactId}`;
@@ -59,6 +59,7 @@ export default function CleanYoutubePlayer({ youtubeId, title }) {
             event.target.mute();
             event.target.playVideo();
             coverTimer = window.setTimeout(() => setIniciando(false), 3200);
+            onReady?.();
 
             intervalRef.current = window.setInterval(() => {
               const player = playerRef.current;
@@ -87,6 +88,7 @@ export default function CleanYoutubePlayer({ youtubeId, title }) {
       playerRef.current?.destroy?.();
       playerRef.current = null;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, playerId]);
 
   return (

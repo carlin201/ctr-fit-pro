@@ -75,3 +75,31 @@ export function limparProgressoLocal(uid) {
     localStorage.removeItem(chaveProgresso(uid));
   } catch {}
 }
+
+// --- Exercícios marcados como concluídos na ficha (por dia e por data) ---
+function chaveConcluidos(uid) {
+  return `ctr_ficha_concluidos_${uid || "anon"}`;
+}
+
+function hojeISO() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+export function carregarConcluidos(uid, dia) {
+  try {
+    const raw = JSON.parse(localStorage.getItem(chaveConcluidos(uid)) || "{}");
+    if (raw.data !== hojeISO()) return [];
+    return Array.isArray(raw.dias?.[dia]) ? raw.dias[dia] : [];
+  } catch {
+    return [];
+  }
+}
+
+export function salvarConcluidos(uid, dia, lista) {
+  try {
+    const atual = JSON.parse(localStorage.getItem(chaveConcluidos(uid)) || "{}");
+    const base = atual.data === hojeISO() ? atual : { data: hojeISO(), dias: {} };
+    base.dias = { ...(base.dias || {}), [dia]: lista };
+    localStorage.setItem(chaveConcluidos(uid), JSON.stringify(base));
+  } catch {}
+}

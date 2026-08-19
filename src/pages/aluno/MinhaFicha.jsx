@@ -6,13 +6,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../services/AuthContext.jsx";
-import { carregarFicha, DIAS, DIAS_LABEL } from "../../services/fichas.js";
+import { carregarFicha, DIAS, DIAS_LABEL, diasOrdenados, nomeDoDia } from "../../services/fichas.js";
 import { gerarPDFFicha } from "../../services/pdf.js";
-import { diaDaSemanaAtual, encontrarVideoDoExercicio } from "../../services/workout.js";
+import {
+  diaDaSemanaAtual, encontrarVideoDoExercicio,
+  carregarConcluidos, salvarConcluidos,
+} from "../../services/workout.js";
 import { loadVideos } from "../../services/videos.js";
 import { resolverExercicio } from "../../services/biblioteca.js";
 import VideoPlayer from "../../components/VideoPlayer.jsx";
-import { Download, Share2, Play, History, Eye } from "lucide-react";
+import { Download, Share2, Play, History, Check } from "lucide-react";
 
 export default function MinhaFicha() {
   const { user } = useAuth();
@@ -21,12 +24,18 @@ export default function MinhaFicha() {
   const [loading, setLoading] = useState(true);
   const [videos, setVideos] = useState([]);
   const [videoAberto, setVideoAberto] = useState(null);
+  const [diaAtivo, setDiaAtivo] = useState(diaDaSemanaAtual());
+  const [concluidos, setConcluidos] = useState([]);
 
   useEffect(() => {
     if (!user) return;
     carregarFicha(user.uid).then((f) => { setFicha(f); setLoading(false); });
     loadVideos().then(setVideos);
   }, [user]);
+
+  useEffect(() => {
+    if (user?.uid) setConcluidos(carregarConcluidos(user.uid, diaAtivo));
+  }, [user?.uid, diaAtivo]);
 
   if (loading) return <p style={{ color: "var(--text-muted)" }}>Carregando ficha...</p>;
 
@@ -60,6 +69,17 @@ export default function MinhaFicha() {
     });
     const url = `https://wa.me/?text=${encodeURIComponent(txt)}`;
     window.open(url, "_blank");
+  };
+
+  const ordem = diasOrdenados(ficha);
+  const listaDia = ficha.dias?.[diaAtivo] || [];
+  const feitos = listaDia.filter((_, i) => concluidos.includes(i)).length;
+  const percentual = listaDia.length ? Math.round((feitos / listaDia.length) * 100) : 0;
+
+  const alternarConcluido = (i) => {
+    const novo = concluidos.includes(i) ? concluidos.filter((x) => x !== i) : [...concluidos, i];
+    setConcluidos(novo);
+    if (user?.uid) salvarConcluidos(user.uid, diaAtivo, novo);
   };
 
   return (
@@ -103,47 +123,87 @@ export default function MinhaFicha() {
         <button className="btn btn-secondary" onClick={compartilhar}><Share2 size={16}/> WhatsApp</button>
       </div>
 
-      {DIAS.map((d) => {
-        const exs = ficha.dias?.[d] || [];
-        const categoria = ficha.categorias?.[d];
-        return (
-          <div key={d} className="card dia-card">
-            <h3 style={{ textTransform: "uppercase", letterSpacing: 0.5 }}>
-              {DIAS_LABEL[d]}
-              {categoria && <span style={{ marginLeft: 6, color: "var(--primary)" }}>• {categoria}</span>}
-            </h3>
-            {exs.length === 0 ? (
-              <p className="empty-day">Descanso</p>
-            ) : exs.map((item, i) => {
-              const ex = resolverExercicio(item, videos);
-              const video = ex.temVideo
-                ? { titulo: ex.nome, youtubeId: ex.youtubeId, descricao: ex.descricao, categoria: ex.categoria }
-                : encontrarVideoDoExercicio(videos, ex.nome);
-              return (
-                <div key={i} className="exercicio ficha-ex">
-                  <div className="ficha-ex-top">
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <h4>{ex.nome}</h4>
-                      <p className="ficha-ex-serie">{ex.series}x{ex.reps}</p>
-                      <p>Descanso: {ex.descanso}</p>
-                      {ex.carga && <p>Carga: {ex.carga}</p>}
-                      {ex.obs && <p className="obs">{ex.obs}</p>}
-                    </div>
-                  </div>
-                  {video && (
-                    <button
-                      className="btn btn-secondary ficha-ex-video"
-                      onClick={() => setVideoAberto(video)}
-                    >
-                      <Play size={14} /> Assistir Execução
-                    </button>
-                  )}
-                </div>
-              );
-            })}
+      {/* Abas de dias (respeita a ordem e os nomes definidos pelo personal) */}
+      <div className="ficha-dias">
+        {ordem.map((d) => {
+          const qtd = (ficha.dias?.[d] || []).length;
+          return (
+            <button
+              key={d}
+              className={`ficha-dia-tab ${diaAtivo === d ? "active" : ""}`}
+              onClick={() => setDiaAtivo(d)}
+            >
+              {nomeDoDia(ficha, d)}
+              <small>{ficha.categorias?.[d] || (qtd ? `${qtd} exercícios` : "Descanso")}</small>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Progresso do treino do dia */}
+      {listaDia.length > 0 && (
+        <div className="ficha-progress">
+          <div className="ficha-progress-track">
+            <div className="ficha-progress-fill" style={{ width: `${percentual}%` }} />
           </div>
-        );
-      })}
+          <div className="ficha-progress-label">
+            <span>{feitos}/{listaDia.length} exercícios concluídos</span>
+            <span>{percentual}%</span>
+          </div>
+        </div>
+      )}
+
+      <div className="card dia-card">
+        <h3 style={{ textTransform: "uppercase", letterSpacing: 0.5 }}>
+          {nomeDoDia(ficha, diaAtivo)}
+          {ficha.categorias?.[diaAtivo] && (
+            <span style={{ marginLeft: 6, color: "var(--primary)" }}>• {ficha.categorias[diaAtivo]}</span>
+          )}
+        </h3>
+
+        {listaDia.length === 0 ? (
+          <p className="empty-day">Descanso</p>
+        ) : listaDia.map((item, i) => {
+          const ex = resolverExercicio(item, videos);
+          const video = ex.temVideo
+            ? { id: `${diaAtivo}-${i}`, titulo: ex.nome, youtubeId: ex.youtubeId, descricao: ex.descricao, categoria: ex.categoria }
+            : encontrarVideoDoExercicio(videos, ex.nome);
+          const feito = concluidos.includes(i);
+          return (
+            <div key={i} className={`exercicio ficha-ex ficha-card ${feito ? "feito" : ""}`}>
+              <div className="ficha-card-head">
+                <button
+                  className={`ficha-check ${feito ? "on" : ""}`}
+                  onClick={() => alternarConcluido(i)}
+                  aria-label={feito ? "Desmarcar exercício" : "Marcar como concluído"}
+                >
+                  <Check size={16} />
+                </button>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <h4 style={{ textDecoration: feito ? "line-through" : "none" }}>{ex.nome}</h4>
+                  <div className="ficha-specs">
+                    <span className="ficha-spec"><b>{ex.series}</b> séries</span>
+                    <span className="ficha-spec"><b>{ex.reps}</b> repetições</span>
+                    {ex.descanso && <span className="ficha-spec">Descanso <b>{ex.descanso}</b></span>}
+                    {ex.carga && <span className="ficha-spec">Carga <b>{ex.carga}</b></span>}
+                    {ex.tempo && <span className="ficha-spec">Tempo <b>{ex.tempo}</b></span>}
+                    {ex.distancia && <span className="ficha-spec">Distância <b>{ex.distancia}</b></span>}
+                  </div>
+                  {ex.obs && <p className="ficha-obs">{ex.obs}</p>}
+                </div>
+              </div>
+              {video && (
+                <button
+                  className="btn btn-secondary ficha-ex-video"
+                  onClick={() => setVideoAberto(video)}
+                >
+                  <Play size={14} /> Assistir Execução
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
 
       <VideoPlayer video={videoAberto} onClose={() => setVideoAberto(null)} />
     </div>
