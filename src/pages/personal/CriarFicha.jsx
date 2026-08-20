@@ -13,14 +13,14 @@
 // ============================================================
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { listarAlunos, salvarFicha, carregarFicha, deletarFicha, fichaVazia, DIAS, DIAS_LABEL } from "../../services/fichas.js";
+import { listarAlunos, salvarFicha, carregarFicha, deletarFicha, fichaVazia, DIAS, DIAS_LABEL, diasOrdenados, nomeDoDia, rotuloDoDia } from "../../services/fichas.js";
 import { gerarPDFFicha } from "../../services/pdf.js";
 import {
   carregarBiblioteca, resolverExercicio, CATEGORIAS_BIBLIOTECA,
 } from "../../services/biblioteca.js";
 import ExercisePicker from "../../components/ExercisePicker.jsx";
 import Toast from "../../components/Toast.jsx";
-import { Plus, Trash2, Save, Download, Send, Copy, GripVertical, PlayCircle, VideoOff, CopyPlus } from "lucide-react";
+import { Plus, Trash2, Save, Download, Send, Copy, GripVertical, PlayCircle, VideoOff, CopyPlus, ChevronUp, ChevronDown } from "lucide-react";
 
 // Categorias de treino do dia (biblioteca + combinações comuns)
 const CATEGORIAS_DIA = [
@@ -126,6 +126,8 @@ export default function CriarFicha() {
   };
 
   const removeExercicio = (dia, i) => {
+    const ex = resolverExercicio((ficha.dias[dia] || [])[i] || {}, biblioteca);
+    if (!window.confirm(`Remover "${ex.nome}" deste dia?`)) return;
     setDia(dia, (ficha.dias[dia] || []).filter((_, idx) => idx !== i));
   };
 
@@ -137,6 +139,31 @@ export default function CriarFicha() {
 
   const setCategoriaDia = (dia, cat) => {
     setFicha({ ...ficha, categorias: { ...(ficha.categorias || {}), [dia]: cat } });
+  };
+
+  // Nome personalizado do dia (ex: "Treino A")
+  const setNomeDia = (dia, nome) => {
+    setFicha((f) => ({ ...f, nomesDias: { ...(f.nomesDias || {}), [dia]: nome } }));
+  };
+
+  // Move o dia na ordem da ficha
+  const moverDia = (dia, delta) => {
+    setFicha((f) => {
+      const ordem = diasOrdenados(f);
+      const i = ordem.indexOf(dia);
+      const j = i + delta;
+      if (i < 0 || j < 0 || j >= ordem.length) return f;
+      const nova = [...ordem];
+      [nova[i], nova[j]] = [nova[j], nova[i]];
+      return { ...f, ordemDias: nova };
+    });
+  };
+
+  // Limpa todos os exercícios de um dia
+  const limparDia = (dia) => {
+    if (!(ficha.dias[dia] || []).length) return;
+    if (!window.confirm(`Apagar todos os exercícios de ${nomeDoDia(ficha, dia)}?`)) return;
+    setDia(dia, []);
   };
 
   // Duplica o dia completo (exercícios + categoria) para outro dia
