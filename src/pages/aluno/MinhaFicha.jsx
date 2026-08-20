@@ -6,7 +6,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../services/AuthContext.jsx";
-import { carregarFicha, DIAS, DIAS_LABEL, diasOrdenados, nomeDoDia } from "../../services/fichas.js";
+import { carregarFicha, diasOrdenados, nomeDoDia, rotuloDoDia } from "../../services/fichas.js";
 import { gerarPDFFicha } from "../../services/pdf.js";
 import {
   diaDaSemanaAtual, encontrarVideoDoExercicio,
@@ -56,11 +56,10 @@ export default function MinhaFicha() {
 
   const compartilhar = () => {
     let txt = `🏋️ *Ficha CTR Fitness* — ${ficha.nome}\n\n`;
-    DIAS.forEach((d) => {
+    diasOrdenados(ficha).forEach((d) => {
       const exs = ficha.dias?.[d] || [];
       if (!exs.length) return;
-      const cat = ficha.categorias?.[d];
-      txt += `*${DIAS_LABEL[d]}${cat ? ` • ${cat}` : ""}*\n`;
+      txt += `*${rotuloDoDia(ficha, d)}*\n`;
       exs.forEach((item, i) => {
         const e = resolverExercicio(item, videos);
         txt += `${i + 1}. ${e.nome} — ${e.series}x${e.reps} (${e.descanso})${e.carga ? ` · ${e.carga}` : ""}\n`;

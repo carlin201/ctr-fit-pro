@@ -5,7 +5,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../services/AuthContext.jsx";
-import { listarHistoricoFichas, DIAS, DIAS_LABEL, carregarFicha } from "../../services/fichas.js";
+import { listarHistoricoFichas, diasOrdenados, rotuloDoDia, carregarFicha } from "../../services/fichas.js";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { loadVideos } from "../../services/videos.js";
 import { resolverExercicio } from "../../services/biblioteca.js";
@@ -108,11 +108,11 @@ function DetalheFicha({ ficha, onVoltar }) {
         {ficha.objetivo && <p style={{ marginTop: 8, color: "var(--text-muted)" }}>🎯 {ficha.objetivo}</p>}
       </div>
 
-      {DIAS.map((d) => {
+      {diasOrdenados(ficha).map((d) => {
         const exs = ficha.dias?.[d] || [];
         return (
           <div key={d} className="card dia-card">
-            <h3>{DIAS_LABEL[d]}{ficha.categorias?.[d] ? ` • ${ficha.categorias[d]}` : ""}</h3>
+            <h3>{rotuloDoDia(ficha, d)}</h3>
             {exs.length === 0 ? (
               <p className="empty-day">Descanso</p>
             ) : exs.map((item, i) => {

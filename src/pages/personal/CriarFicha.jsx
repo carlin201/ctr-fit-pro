@@ -13,14 +13,14 @@
 // ============================================================
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { listarAlunos, salvarFicha, carregarFicha, deletarFicha, fichaVazia, DIAS, DIAS_LABEL } from "../../services/fichas.js";
+import { listarAlunos, salvarFicha, carregarFicha, deletarFicha, fichaVazia, DIAS, DIAS_LABEL, diasOrdenados, nomeDoDia, rotuloDoDia } from "../../services/fichas.js";
 import { gerarPDFFicha } from "../../services/pdf.js";
 import {
   carregarBiblioteca, resolverExercicio, CATEGORIAS_BIBLIOTECA,
 } from "../../services/biblioteca.js";
 import ExercisePicker from "../../components/ExercisePicker.jsx";
 import Toast from "../../components/Toast.jsx";
-import { Plus, Trash2, Save, Download, Send, Copy, GripVertical, PlayCircle, VideoOff, CopyPlus } from "lucide-react";
+import { Plus, Trash2, Save, Download, Send, Copy, GripVertical, PlayCircle, VideoOff, CopyPlus, ChevronUp, ChevronDown } from "lucide-react";
 
 // Categorias de treino do dia (biblioteca + combinações comuns)
 const CATEGORIAS_DIA = [
@@ -126,6 +126,8 @@ export default function CriarFicha() {
   };
 
   const removeExercicio = (dia, i) => {
+    const ex = resolverExercicio((ficha.dias[dia] || [])[i] || {}, biblioteca);
+    if (!window.confirm(`Remover "${ex.nome}" deste dia?`)) return;
     setDia(dia, (ficha.dias[dia] || []).filter((_, idx) => idx !== i));
   };
 
@@ -137,6 +139,31 @@ export default function CriarFicha() {
 
   const setCategoriaDia = (dia, cat) => {
     setFicha({ ...ficha, categorias: { ...(ficha.categorias || {}), [dia]: cat } });
+  };
+
+  // Nome personalizado do dia (ex: "Treino A")
+  const setNomeDia = (dia, nome) => {
+    setFicha((f) => ({ ...f, nomesDias: { ...(f.nomesDias || {}), [dia]: nome } }));
+  };
+
+  // Move o dia na ordem da ficha
+  const moverDia = (dia, delta) => {
+    setFicha((f) => {
+      const ordem = diasOrdenados(f);
+      const i = ordem.indexOf(dia);
+      const j = i + delta;
+      if (i < 0 || j < 0 || j >= ordem.length) return f;
+      const nova = [...ordem];
+      [nova[i], nova[j]] = [nova[j], nova[i]];
+      return { ...f, ordemDias: nova };
+    });
+  };
+
+  // Limpa todos os exercícios de um dia
+  const limparDia = (dia) => {
+    if (!(ficha.dias[dia] || []).length) return;
+    if (!window.confirm(`Apagar todos os exercícios de ${nomeDoDia(ficha, dia)}?`)) return;
+    setDia(dia, []);
   };
 
   // Duplica o dia completo (exercícios + categoria) para outro dia
@@ -222,17 +249,31 @@ export default function CriarFicha() {
             <p style={{ color: "var(--text-muted)", fontSize: 13 }}>{totalExercicios} exercícios na ficha</p>
           </div>
 
-          {/* Dias da semana */}
-          {DIAS.map((dia) => {
+          {/* Dias da semana (na ordem definida na ficha) */}
+          {diasOrdenados(ficha).map((dia, posDia, ordemDias) => {
             const lista = ficha.dias[dia] || [];
             const catDia = ficha.categorias?.[dia] || "";
             return (
               <details key={dia} className="dia-editor" open>
                 <summary>
                   <span>
-                    {DIAS_LABEL[dia]}{catDia ? ` • ${catDia}` : ""}
+                    {rotuloDoDia(ficha, dia)}
                     <span style={{ color: "var(--text-muted)", fontWeight: 400 }}> ({lista.length} exercícios)</span>
                   </span>
+                  <button
+                    type="button"
+                    className="icon-btn"
+                    aria-label="Mover dia para cima"
+                    disabled={posDia === 0}
+                    onClick={(e) => { e.preventDefault(); moverDia(dia, -1); }}
+                  ><ChevronUp size={14}/></button>
+                  <button
+                    type="button"
+                    className="icon-btn"
+                    aria-label="Mover dia para baixo"
+                    disabled={posDia === ordemDias.length - 1}
+                    onClick={(e) => { e.preventDefault(); moverDia(dia, 1); }}
+                  ><ChevronDown size={14}/></button>
                   <button
                     type="button"
                     className="btn btn-secondary"
@@ -244,6 +285,15 @@ export default function CriarFicha() {
                 </summary>
 
                 <div className="dia-config">
+                  <div className="field" style={{ marginBottom: 0 }}>
+                    <label style={{ fontSize: 12 }}>Nome do dia (opcional)</label>
+                    <input
+                      className="input"
+                      placeholder={DIAS_LABEL[dia]}
+                      value={ficha.nomesDias?.[dia] || ""}
+                      onChange={(e) => setNomeDia(dia, e.target.value)}
+                    />
+                  </div>
                   <div className="field" style={{ marginBottom: 0 }}>
                     <label style={{ fontSize: 12 }}>Categoria do treino</label>
                     <select className="select" value={catDia} onChange={(e) => setCategoriaDia(dia, e.target.value)}>
@@ -323,14 +373,24 @@ export default function CriarFicha() {
                 })}
 
                 {lista.length > 0 && (
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    style={{ width: "auto", padding: "8px 12px", fontSize: 13, marginTop: 4 }}
-                    onClick={() => setPickerDia(dia)}
-                  >
-                    <CopyPlus size={14}/> Adicionar outro exercício
-                  </button>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 4 }}>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      style={{ width: "auto", padding: "8px 12px", fontSize: 13 }}
+                      onClick={() => setPickerDia(dia)}
+                    >
+                      <CopyPlus size={14}/> Adicionar outro exercício
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      style={{ width: "auto", padding: "8px 12px", fontSize: 13 }}
+                      onClick={() => limparDia(dia)}
+                    >
+                      <Trash2 size={14}/> Limpar dia
+                    </button>
+                  </div>
                 )}
               </details>
             );
