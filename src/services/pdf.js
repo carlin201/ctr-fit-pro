@@ -3,7 +3,7 @@
 // Usa a biblioteca jsPDF.
 // ============================================================
 import jsPDF from "jspdf";
-import { DIAS, DIAS_LABEL } from "./fichas.js";
+import { diasOrdenados, rotuloDoDia } from "./fichas.js";
 import { resolverExercicio } from "./biblioteca.js";
 
 export function gerarPDFFicha(ficha, biblioteca = []) {
@@ -23,14 +23,13 @@ export function gerarPDFFicha(ficha, biblioteca = []) {
   pdf.text(`Objetivo: ${ficha.objetivo || "-"}`, margin, y); y += 6;
   pdf.text(`Professor: ${ficha.professor || "-"}`, margin, y); y += 10;
 
-  DIAS.forEach((dia) => {
+  diasOrdenados(ficha).forEach((dia) => {
     const exs = ficha.dias?.[dia] || [];
     if (exs.length === 0) return;
     if (y > 260) { pdf.addPage(); y = margin; }
     pdf.setFontSize(14);
     pdf.setTextColor(220, 38, 38);
-    const catDia = ficha.categorias?.[dia];
-    pdf.text(DIAS_LABEL[dia] + (catDia ? ` - ${catDia}` : ""), margin, y); y += 7;
+    pdf.text(rotuloDoDia(ficha, dia), margin, y); y += 7;
     pdf.setFontSize(10);
     pdf.setTextColor(0, 0, 0);
     exs.forEach((item, i) => {
