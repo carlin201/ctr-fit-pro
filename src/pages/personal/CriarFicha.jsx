@@ -249,17 +249,31 @@ export default function CriarFicha() {
             <p style={{ color: "var(--text-muted)", fontSize: 13 }}>{totalExercicios} exercícios na ficha</p>
           </div>
 
-          {/* Dias da semana */}
-          {DIAS.map((dia) => {
+          {/* Dias da semana (na ordem definida na ficha) */}
+          {diasOrdenados(ficha).map((dia, posDia, ordemDias) => {
             const lista = ficha.dias[dia] || [];
             const catDia = ficha.categorias?.[dia] || "";
             return (
               <details key={dia} className="dia-editor" open>
                 <summary>
                   <span>
-                    {DIAS_LABEL[dia]}{catDia ? ` • ${catDia}` : ""}
+                    {rotuloDoDia(ficha, dia)}
                     <span style={{ color: "var(--text-muted)", fontWeight: 400 }}> ({lista.length} exercícios)</span>
                   </span>
+                  <button
+                    type="button"
+                    className="icon-btn"
+                    aria-label="Mover dia para cima"
+                    disabled={posDia === 0}
+                    onClick={(e) => { e.preventDefault(); moverDia(dia, -1); }}
+                  ><ChevronUp size={14}/></button>
+                  <button
+                    type="button"
+                    className="icon-btn"
+                    aria-label="Mover dia para baixo"
+                    disabled={posDia === ordemDias.length - 1}
+                    onClick={(e) => { e.preventDefault(); moverDia(dia, 1); }}
+                  ><ChevronDown size={14}/></button>
                   <button
                     type="button"
                     className="btn btn-secondary"
@@ -271,6 +285,15 @@ export default function CriarFicha() {
                 </summary>
 
                 <div className="dia-config">
+                  <div className="field" style={{ marginBottom: 0 }}>
+                    <label style={{ fontSize: 12 }}>Nome do dia (opcional)</label>
+                    <input
+                      className="input"
+                      placeholder={DIAS_LABEL[dia]}
+                      value={ficha.nomesDias?.[dia] || ""}
+                      onChange={(e) => setNomeDia(dia, e.target.value)}
+                    />
+                  </div>
                   <div className="field" style={{ marginBottom: 0 }}>
                     <label style={{ fontSize: 12 }}>Categoria do treino</label>
                     <select className="select" value={catDia} onChange={(e) => setCategoriaDia(dia, e.target.value)}>
@@ -350,14 +373,24 @@ export default function CriarFicha() {
                 })}
 
                 {lista.length > 0 && (
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    style={{ width: "auto", padding: "8px 12px", fontSize: 13, marginTop: 4 }}
-                    onClick={() => setPickerDia(dia)}
-                  >
-                    <CopyPlus size={14}/> Adicionar outro exercício
-                  </button>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 4 }}>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      style={{ width: "auto", padding: "8px 12px", fontSize: 13 }}
+                      onClick={() => setPickerDia(dia)}
+                    >
+                      <CopyPlus size={14}/> Adicionar outro exercício
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      style={{ width: "auto", padding: "8px 12px", fontSize: 13 }}
+                      onClick={() => limparDia(dia)}
+                    >
+                      <Trash2 size={14}/> Limpar dia
+                    </button>
+                  </div>
                 )}
               </details>
             );
