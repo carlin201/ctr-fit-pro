@@ -12,6 +12,20 @@ export const CATEGORIAS = [
   "Mobilidade"
 ];
 
+// Normaliza texto (minúsculas, sem acento) para comparações tolerantes.
+export function normalizarTexto(txt = "") {
+  return String(txt)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
+}
+
+// Compara categorias ignorando acentos e caixa ("Biceps" === "Bíceps")
+export function mesmaCategoria(a, b) {
+  return normalizarTexto(a) === normalizarTexto(b);
+}
+
 export async function loadVideos() {
   try {
     const response = await fetch("/videos/videos.json", {
@@ -75,12 +89,15 @@ export function youtubeThumb(youtubeId) {
   return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : "";
 }
 
-// Contagem de exercícios por categoria.
+// Contagem de exercícios por categoria (tolerante a acentos: "Biceps" conta em "Bíceps").
 export function contarPorCategoria(videos = []) {
-  return videos.reduce((acc, v) => {
-    acc[v.categoria] = (acc[v.categoria] || 0) + 1;
-    return acc;
-  }, {});
+  const acc = {};
+  videos.forEach((v) => {
+    const chave = normalizarTexto(v.categoria);
+    if (!chave) return;
+    acc[chave] = (acc[chave] || 0) + 1;
+  });
+  return acc;
 }
 
 // ============================================================
