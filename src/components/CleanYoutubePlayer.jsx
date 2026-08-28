@@ -70,11 +70,6 @@ export default function CleanYoutubePlayer({ youtubeId, title, onReady }) {
           videoId: id,
           playerVars: {
             autoplay: 1,
-            controls: 0,
-            disablekb: 1,
-            fs: 0,
-            iv_load_policy: 3,
-            modestbranding: 1,
             playsinline: 1,
             rel: 0,
           },
@@ -147,7 +142,6 @@ export default function CleanYoutubePlayer({ youtubeId, title, onReady }) {
     <div className="yt-frame" aria-label={title}>
       <div id={playerId} />
       <div className={`yt-start-cover ${iniciando ? "visible" : ""}`} aria-hidden="true" />
-      <div className="yt-interaction-shield" aria-hidden="true" />
     </div>
   );
 }
