@@ -8,7 +8,9 @@
 //   { exercicioId, series, reps, descanso, carga, obs }
 // Fichas antigas (com `nome` digitado) continuam funcionando.
 // ============================================================
-import { loadVideos, extrairYoutubeId, temVideo } from "./videos.js";
+import { loadVideos, extrairYoutubeId, temVideo, normalizarTexto, mesmaCategoria } from "./videos.js";
+
+export { normalizarTexto, mesmaCategoria };
 
 // Categorias oficiais do sistema (ordem usada nos filtros)
 export const CATEGORIAS_BIBLIOTECA = [
@@ -26,19 +28,6 @@ export const CATEGORIAS_BIBLIOTECA = [
   "Alongamento",
   "Mobilidade",
 ];
-
-export function normalizarTexto(txt = "") {
-  return String(txt)
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim();
-}
-
-// Compara categorias ignorando acentos ("Biceps" === "Bíceps")
-export function mesmaCategoria(a, b) {
-  return normalizarTexto(a) === normalizarTexto(b);
-}
 
 // Carrega a biblioteca: só exercícios com título preenchido, ordem A-Z.
 export async function carregarBiblioteca() {
