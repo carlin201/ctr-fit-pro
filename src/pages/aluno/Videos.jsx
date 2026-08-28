@@ -4,7 +4,7 @@
 // ============================================================
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { loadVideos, CATEGORIAS, carregarPreferenciasVideos, toggleFavoritoVideo, registrarVisualizacao, youtubeThumb, temVideo, contarPorCategoria } from "../../services/videos.js";
+import { loadVideos, CATEGORIAS, carregarPreferenciasVideos, toggleFavoritoVideo, registrarVisualizacao, youtubeThumb, temVideo, contarPorCategoria, mesmaCategoria, normalizarTexto } from "../../services/videos.js";
 import { useAuth } from "../../services/AuthContext.jsx";
 import VideoPlayer from "../../components/VideoPlayer.jsx";
 import { Play, Search, Heart, ArrowDownAZ, VideoOff } from "lucide-react";
@@ -30,7 +30,7 @@ export default function Videos() {
 
   const filtered = useMemo(() => {
     let base = all.filter((v) => {
-      const okCat = cat === "Todos" || v.categoria === cat;
+      const okCat = cat === "Todos" || mesmaCategoria(v.categoria, cat);
       const okQ = !q || v.titulo.toLowerCase().includes(q.toLowerCase());
       return okCat && okQ;
     });
@@ -98,7 +98,7 @@ export default function Videos() {
         <button className={`chip ${cat === "Todos" ? "active" : ""}`} onClick={() => setCat("Todos")}>Todos ({all.length})</button>
         {CATEGORIAS.map((c) => (
           <button key={c} className={`chip ${cat === c ? "active" : ""}`} onClick={() => setCat(c)}>
-            {c} ({contagens[c] || 0})
+            {c} ({contagens[normalizarTexto(c)] || 0})
           </button>
         ))}
       </div>
