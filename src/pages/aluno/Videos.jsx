@@ -49,6 +49,34 @@ export default function Videos() {
 
   const contagens = useMemo(() => contarPorCategoria(all), [all]);
 
+  // Só mostra chips de categorias que realmente têm vídeo cadastrado
+  // (evita chips vazios tipo "Pernas (0)" bagunçando a barra), mantendo
+  // o rótulo "bonito" (com acento) da lista oficial quando existir.
+  const categoriasComVideo = useMemo(() => {
+    const presentes = new Set(
+      all.map((v) => normalizarTexto(v.categoria)).filter(Boolean)
+    );
+    const rotulos = [];
+    const usados = new Set();
+    CATEGORIAS.forEach((c) => {
+      const chave = normalizarTexto(c);
+      if (presentes.has(chave) && !usados.has(chave)) {
+        rotulos.push(c);
+        usados.add(chave);
+      }
+    });
+    // Categorias que existem nos vídeos mas não estão na lista oficial
+    // (ex.: cadastradas com nome diferente) também aparecem, com o nome como veio.
+    all.forEach((v) => {
+      const chave = normalizarTexto(v.categoria);
+      if (chave && !usados.has(chave)) {
+        rotulos.push(v.categoria);
+        usados.add(chave);
+      }
+    });
+    return rotulos;
+  }, [all]);
+
   const abrir = async (v) => {
     setSelected(v);
     if (user?.uid) {
@@ -96,7 +124,7 @@ export default function Videos() {
 
       <div className="chip-row">
         <button className={`chip ${cat === "Todos" ? "active" : ""}`} onClick={() => setCat("Todos")}>Todos ({all.length})</button>
-        {CATEGORIAS.map((c) => (
+        {categoriasComVideo.map((c) => (
           <button key={c} className={`chip ${cat === c ? "active" : ""}`} onClick={() => setCat(c)}>
             {c} ({contagens[normalizarTexto(c)] || 0})
           </button>
