@@ -383,5 +383,89 @@
     "categoria": "Costas",
     "youtubeId": "https://youtube.com/shorts/IN-lN3XRzts",
     "descricao": "Puxada frente com barra"
+  },
+  {
+    "id": 56,
+    "titulo": "RDL",
+    "categoria": "Pernas",
+    "youtubeId": "https://youtube.com/shorts/_gpSexcTyRM",
+    "descricao": "RDL"
+  },
+  {
+    "id": 57,
+    "titulo": "Stiff com barra",
+    "categoria": "Pernas",
+    "youtubeId": "https://youtube.com/shorts/b4aut2MrasQ",
+    "descricao": "Stiff com barra"
+  },
+  {
+    "id": 58,
+    "titulo": "Búlgaro",
+    "categoria": "Pernas",
+    "youtubeId": "https://youtube.com/shorts/-Uf1F0NXkqo",
+    "descricao": "Búlgaro"
+  },
+  {
+    "id": 59,
+    "titulo": "Mesa flexora",
+    "categoria": "Pernas",
+    "youtubeId": "https://youtube.com/shorts/xOS24KoQocQ",
+    "descricao": "Mesa flexora"
+  },
+  {
+    "id": 60,
+    "titulo": "Agachamento sumô",
+    "categoria": "Pernas",
+    "youtubeId": "https://youtube.com/shorts/4TpiZi_LMIc",
+    "descricao": "Agachamento sumô"
+  },
+  {
+    "id": 61,
+    "titulo": "Agachamento no smith",
+    "categoria": "Pernas",
+    "youtubeId": "https://youtube.com/shorts/JigNXfq6TD8?feature=share",
+    "descricao": "Agachamento no smith"
+  },
+  {
+    "id": 62,
+    "titulo": "Agachamento barra livre",
+    "categoria": "Pernas",
+    "youtubeId": "https://youtube.com/shorts/4qtNfdBXpA0?feature=share",
+    "descricao": "Agachamento barra livre"
+  },
+  {
+    "id": 63,
+    "titulo": "Agachamento squat tipo 2",
+    "categoria": "Pernas",
+    "youtubeId": "https://youtube.com/shorts/Fza2r38kH88",
+    "descricao": "Agachamento squat tipo 2"
+  },
+  {
+    "id": 64,
+    "titulo": "Agachamento squat tipo 1",
+    "categoria": "Pernas",
+    "youtubeId": "https://youtube.com/shorts/drIVx30ggTY",
+    "descricao": "Agachamento squat tipo 1"
+  },
+  {
+    "id": 65,
+    "titulo": "Cadeira flexora sentada",
+    "categoria": "Pernas",
+    "youtubeId": "https://youtube.com/shorts/TTbcf0GxGG4",
+    "descricao": "Cadeira flexora sentada"
+  },
+  {
+    "id": 66,
+    "titulo": "Cadeira extensora unilateral",
+    "categoria": "Pernas",
+    "youtubeId": "https://youtube.com/shorts/2ic9dpeesWY",
+    "descricao": "Cadeira extensora unilateral"
+  },
+  {
+    "id": 67,
+    "titulo": "Flexora unilateral",
+    "categoria": "Pernas",
+    "youtubeId": "https://youtube.com/shorts/KcanAVTTvN0",
+    "descricao": "Flexora unilateral"
   }
 ]
