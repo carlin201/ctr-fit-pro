@@ -8,6 +8,8 @@
 //   • mostra "carregando" enquanto o YouTube inicializa
 //   • botão de tela cheia (Fullscreen API), sem sair do app
 // Se não houver youtubeId, mostra card "Vídeo ainda não disponível."
+// Renderizado via portal (document.body) para nunca ficar preso dentro
+// de containers com transform/filter da página (quebraria position:fixed).
 // ============================================================
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -18,6 +20,10 @@ import CleanYoutubePlayer from "./CleanYoutubePlayer.jsx";
 export default function VideoPlayer({ video, onClose }) {
   const stageRef = useRef(null);
   const [carregando, setCarregando] = useState(true);
+  // Tamanho do player calculado via JS (mais confiável que vh/aspect-ratio
+  // em CSS puro, que se comporta de forma inconsistente em navegadores
+  // Android de alguns fabricantes — Xiaomi/MIUI e Motorola inclusive).
+  const [tamanho, setTamanho] = useState(null);
 
   const aberto = Boolean(video);
 
@@ -29,7 +35,7 @@ export default function VideoPlayer({ video, onClose }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [aberto, onClose]);
 
-  // Bloqueia o scroll da página sem perder a posição atual
+  // Bloqueia o scroll do body sem perder a posição atual
   useEffect(() => {
     if (!aberto) return undefined;
     const anterior = document.body.style.overflow;
@@ -37,6 +43,39 @@ export default function VideoPlayer({ video, onClose }) {
     setCarregando(true);
     return () => { document.body.style.overflow = anterior; };
   }, [aberto, video?.id]);
+
+  // Recalcula o tamanho do player (proporção 9:16) a partir do tamanho
+  // real da janela — window.innerWidth/innerHeight, que funciona igual
+  // em qualquer navegador, ao contrário de "vh" que varia entre aparelhos
+  // (esse era o motivo do vídeo ficar preto em alguns Android).
+  useEffect(() => {
+    if (!aberto) return undefined;
+
+    const calcular = () => {
+      const jw = window.innerWidth;
+      const jh = window.innerHeight;
+      const RATIO = 9 / 16; // largura / altura
+
+      const alturaMax = Math.max(220, jh * 0.62);
+      const larguraMax = Math.max(200, Math.min(jw * 0.92, 420));
+
+      let largura = larguraMax;
+      let altura = largura / RATIO;
+      if (altura > alturaMax) {
+        altura = alturaMax;
+        largura = altura * RATIO;
+      }
+      setTamanho({ largura: Math.round(largura), altura: Math.round(altura) });
+    };
+
+    calcular();
+    window.addEventListener("resize", calcular);
+    window.addEventListener("orientationchange", calcular);
+    return () => {
+      window.removeEventListener("resize", calcular);
+      window.removeEventListener("orientationchange", calcular);
+    };
+  }, [aberto]);
 
   if (!aberto) return null;
 
@@ -54,7 +93,11 @@ export default function VideoPlayer({ video, onClose }) {
       </button>
 
       <div className="video-modal-inner" onClick={(e) => e.stopPropagation()}>
-        <div className="video-modal-stage" ref={stageRef}>
+        <div
+          className="video-modal-stage"
+          ref={stageRef}
+          style={tamanho ? { width: tamanho.largura, height: tamanho.altura } : undefined}
+        >
           {temVideo(video) ? (
             <>
               <CleanYoutubePlayer
