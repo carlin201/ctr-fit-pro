@@ -1,13 +1,16 @@
 // Player passivo: reinicia o vídeo antes do encerramento para impedir que a
 // interface de fim/replay do YouTube apareça a cada volta do loop.
 import { useEffect, useId, useRef, useState } from "react";
-import { RefreshCw, VideoOff } from "lucide-react";
+import { RefreshCw, VideoOff, Youtube } from "lucide-react";
 import { extrairYoutubeId } from "../services/videos.js";
 
 let youtubeApiPromise;
 
 // Tempo máximo esperando a API/o player ficarem prontos antes de mostrar erro.
-const TIMEOUT_MS = 9000;
+const TIMEOUT_MS = 8000;
+// Se o player "ficar pronto" mas continuar sem tocar nada visível por esse
+// tempo (vídeo removido/restrito sem disparar onError), também mostramos erro.
+const TIMEOUT_POS_READY_MS = 6000;
 
 function carregarYoutubeApi() {
   if (window.YT?.Player) return Promise.resolve(window.YT);
@@ -47,11 +50,18 @@ export default function CleanYoutubePlayer({ youtubeId, title, onReady }) {
   const [tentativa, setTentativa] = useState(0);
 
   useEffect(() => {
-    if (!id) return undefined;
+    // youtubeId ausente ou não reconhecível: mostra erro na hora, sem
+    // ficar com a tela preta de "carregando" pra sempre.
+    if (!id) {
+      setErro(true);
+      return undefined;
+    }
     let ativo = true;
     let coverTimer;
     let timeoutTimer;
+    let posReadyTimer;
     let ficouPronto = false;
+    let comecouATocar = false;
 
     setErro(false);
     setIniciando(true);
@@ -82,10 +92,20 @@ export default function CleanYoutubePlayer({ youtubeId, title, onReady }) {
               coverTimer = window.setTimeout(() => setIniciando(false), 3200);
               onReady?.();
 
+              // Alguns vídeos removidos/restritos "ficam prontos" no player
+              // mas nunca chegam a tocar de fato, sem disparar onError.
+              // Se isso acontecer, mostramos erro em vez de deixar preto.
+              posReadyTimer = window.setTimeout(() => {
+                if (!ativo || comecouATocar) return;
+                const atual = playerRef.current?.getCurrentTime?.() || 0;
+                if (atual <= 0) setErro(true);
+              }, TIMEOUT_POS_READY_MS);
+
               intervalRef.current = window.setInterval(() => {
                 const player = playerRef.current;
                 const duracao = player?.getDuration?.() || 0;
                 const atual = player?.getCurrentTime?.() || 0;
+                if (atual > 0) comecouATocar = true;
                 if (duracao > 0 && atual >= duracao - 0.45) {
                   player.seekTo(0, true);
                   player.playVideo();
@@ -93,6 +113,7 @@ export default function CleanYoutubePlayer({ youtubeId, title, onReady }) {
               }, 150);
             },
             onStateChange: (event) => {
+              if (event.data === YT.PlayerState.PLAYING) comecouATocar = true;
               if (event.data === YT.PlayerState.ENDED) {
                 event.target.seekTo(0, true);
                 event.target.playVideo();
@@ -101,6 +122,7 @@ export default function CleanYoutubePlayer({ youtubeId, title, onReady }) {
             onError: () => {
               if (!ativo) return;
               window.clearTimeout(timeoutTimer);
+              window.clearTimeout(posReadyTimer);
               setErro(true);
             },
           },
@@ -115,6 +137,7 @@ export default function CleanYoutubePlayer({ youtubeId, title, onReady }) {
       ativo = false;
       window.clearTimeout(coverTimer);
       window.clearTimeout(timeoutTimer);
+      window.clearTimeout(posReadyTimer);
       window.clearInterval(intervalRef.current);
       playerRef.current?.destroy?.();
       playerRef.current = null;
@@ -127,13 +150,25 @@ export default function CleanYoutubePlayer({ youtubeId, title, onReady }) {
       <div className="yt-frame yt-frame-erro" aria-label={title}>
         <VideoOff size={26} />
         <p>Não foi possível carregar o vídeo.</p>
-        <button
-          type="button"
-          className="btn btn-secondary"
-          onClick={() => setTentativa((t) => t + 1)}
-        >
-          <RefreshCw size={14} /> Tentar novamente
-        </button>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => setTentativa((t) => t + 1)}
+          >
+            <RefreshCw size={14} /> Tentar novamente
+          </button>
+          {id && (
+            <a
+              className="btn btn-secondary"
+              href={`https://youtube.com/shorts/${id}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Youtube size={14} /> Assistir no YouTube
+            </a>
+          )}
+        </div>
       </div>
     );
   }
