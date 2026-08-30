@@ -12,7 +12,7 @@ import { Play, Search, Heart, ArrowDownAZ, VideoOff } from "lucide-react";
 export default function Videos() {
   const { user } = useAuth();
   const [all, setAll] = useState([]);
-  const [cat, setCat] = useState("Todos");
+  const [cat, setCat] = useState(""); // definido automaticamente pra 1ª categoria com vídeo
   const [q, setQ] = useState("");
   const [aba, setAba] = useState("todos"); // "todos" | "recentes" | "populares"
   const [azOn, setAzOn] = useState(false); // ordenação A-Z
@@ -30,7 +30,7 @@ export default function Videos() {
 
   const filtered = useMemo(() => {
     let base = all.filter((v) => {
-      const okCat = cat === "Todos" || mesmaCategoria(v.categoria, cat);
+      const okCat = !cat || mesmaCategoria(v.categoria, cat);
       const okQ = !q || v.titulo.toLowerCase().includes(q.toLowerCase());
       return okCat && okQ;
     });
@@ -76,6 +76,12 @@ export default function Videos() {
     });
     return rotulos;
   }, [all]);
+
+  // Sem aba "Todos": assim que souber quais categorias existem, seleciona
+  // a primeira automaticamente (evita a tela cheia de 55 vídeos de uma vez).
+  useEffect(() => {
+    if (!cat && categoriasComVideo.length > 0) setCat(categoriasComVideo[0]);
+  }, [cat, categoriasComVideo]);
 
   const abrir = async (v) => {
     setSelected(v);
@@ -123,7 +129,6 @@ export default function Videos() {
       </div>
 
       <div className="chip-row">
-        <button className={`chip ${cat === "Todos" ? "active" : ""}`} onClick={() => setCat("Todos")}>Todos ({all.length})</button>
         {categoriasComVideo.map((c) => (
           <button key={c} className={`chip ${cat === c ? "active" : ""}`} onClick={() => setCat(c)}>
             {c} ({contagens[normalizarTexto(c)] || 0})
