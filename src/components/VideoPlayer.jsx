@@ -10,6 +10,7 @@
 // Se não houver youtubeId, mostra card "Vídeo ainda não disponível."
 // ============================================================
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { X, VideoOff, Maximize2, Loader2 } from "lucide-react";
 import { temVideo } from "../services/videos.js";
 import CleanYoutubePlayer from "./CleanYoutubePlayer.jsx";
@@ -46,7 +47,7 @@ export default function VideoPlayer({ video, onClose }) {
     else el.requestFullscreen?.();
   };
 
-  return (
+  return createPortal(
     <div className="video-modal" role="dialog" aria-modal="true" onClick={onClose}>
       <button className="video-modal-close" onClick={onClose} aria-label="Fechar vídeo">
         <X size={26} />
@@ -85,6 +86,7 @@ export default function VideoPlayer({ video, onClose }) {
           {video.descricao && <p>{video.descricao}</p>}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
