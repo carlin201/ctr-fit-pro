@@ -516,5 +516,75 @@
     "categoria": "Pernas",
     "youtubeId": "https://youtube.com/shorts/L-hAcbVMWi8",
     "descricao": "Cadeira extensora"
+  },
+  {
+    "id": 75,
+    "titulo": "Tríceps Unilateral no Crossover 2",
+    "categoria": "Triceps",
+    "youtubeId": "https://youtube.com/shorts/vyxRF1buBIM",
+    "descricao": "Tríceps Unilateral no Crossover 2"
+  },
+  {
+    "id": 76,
+    "titulo": "Tríceps Unilateral com Halter",
+    "categoria": "Triceps",
+    "youtubeId": "https://youtube.com/shorts/vnTTC7qjJ-w",
+    "descricao": "Tríceps Unilateral com Halter"
+  },
+  {
+    "id": 77,
+    "titulo": "Tríceps Francês com Halter em Pé",
+    "categoria": "Triceps",
+    "youtubeId": "https://youtube.com/shorts/k4fY8DdHsaM",
+    "descricao": "Tríceps Francês com Halter em Pé"
+  },
+  {
+    "id": 78,
+    "titulo": "Tríceps Testa Deitado Barra Livre",
+    "categoria": "Triceps",
+    "youtubeId": "https://youtube.com/shorts/P53XGzgm0So",
+    "descricao": "Tríceps Testa Deitado Barra Livre"
+  },
+  {
+    "id": 79,
+    "titulo": "Bíceps Unilateral no Crossover",
+    "categoria": "Biceps",
+    "youtubeId": "https://youtube.com/shorts/DIslOyU6rN4",
+    "descricao": "Bíceps Unilateral no Crossover"
+  },
+  {
+    "id": 80,
+    "titulo": "Tríceps Unilateral no Crossover",
+    "categoria": "Triceps",
+    "youtubeId": "https://youtube.com/shorts/v2AR3CB0hcU",
+    "descricao": "Tríceps Unilateral no Crossover"
+  },
+  {
+    "id": 81,
+    "titulo": "Tríceps Corda no Crossover",
+    "categoria": "Triceps",
+    "youtubeId": "https://youtube.com/shorts/2u7OV8_KJvc",
+    "descricao": "Tríceps Corda no Crossover"
+  },
+  {
+    "id": 82,
+    "titulo": "Tríceps com Barra no Crossover",
+    "categoria": "Triceps",
+    "youtubeId": "https://youtube.com/shorts/HY2bd-72d7c",
+    "descricao": "Tríceps com Barra no Crossover"
+  },
+  {
+    "id": 83,
+    "titulo": "Flexão de Punho Inversa com Barra no Crossover",
+    "categoria": "Biceps",
+    "youtubeId": "https://youtube.com/shorts/hGd8r9Nf314",
+    "descricao": "Flexão de Punho Inversa com Barra no Crossover"
+  },
+  {
+    "id": 83,
+    "titulo": "Rosca Direta com Barra no Crossover",
+    "categoria": "Biceps",
+    "youtubeId": "https://youtube.com/shorts/p-WYR-c92x0",
+    "descricao": "Rosca Direta com Barra no Crossover"
   }
 ]
