@@ -467,5 +467,75 @@
     "categoria": "Pernas",
     "youtubeId": "https://youtube.com/shorts/KcanAVTTvN0",
     "descricao": "Flexora unilateral"
+  },
+  {
+    "id": 68,
+    "titulo": "Flexora em pé unilateral",
+    "categoria": "Pernas",
+    "youtubeId": "https://youtube.com/shorts/36EBymtk23M",
+    "descricao": "Flexora em pé unilateral"
+  },
+  {
+    "id": 69,
+    "titulo": "Agachamento hack",
+    "categoria": "Pernas",
+    "youtubeId": "https://youtube.com/shorts/dMQlX3_pdyA",
+    "descricao": "Agachamento hack"
+  },
+  {
+    "id": 70,
+    "titulo": "Leg press 45°",
+    "categoria": "Pernas",
+    "youtubeId": "https://youtube.com/shorts/XfYZcE15JZQ",
+    "descricao": "Leg press 45°"
+  },
+  {
+    "id": 71,
+    "titulo": "Elevação pélvica",
+    "categoria": "Pernas",
+    "youtubeId": "https://youtube.com/shorts/1smrhcnvWLo",
+    "descricao": "Elevação pélvica"
+  },
+  {
+    "id": 72,
+    "titulo": "Cadeira abdutora",
+    "categoria": "Pernas",
+    "youtubeId": "https://youtube.com/shorts/-K-jpo84ZDM",
+    "descricao": "Cadeira abdutora"
+  },
+  {
+    "id": 73,
+    "titulo": "Cadeira adutora",
+    "categoria": "Pernas",
+    "youtubeId": "https://youtube.com/shorts/xCCLdOwK8sM",
+    "descricao": "Cadeira adutora"
+  },
+  {
+    "id": 74,
+    "titulo": "Cadeira extensora",
+    "categoria": "Pernas",
+    "youtubeId": "https://youtube.com/shorts/L-hAcbVMWi8",
+    "descricao": "Cadeira extensora"
+  },
+  {
+    "id": 75,
+    "titulo": "",
+    "categoria": "Pernas",
+    "youtubeId": "",
+    "descricao": ""
+  },
+  {
+    "id": 76,
+    "titulo": "",
+    "categoria": "Pernas",
+    "youtubeId": "",
+    "descricao": ""
+  },
+  {
+    "id": 77,
+    "titulo": "",
+    "categoria": "Pernas",
+    "youtubeId": "",
+    "descricao": ""
   }
 ]
