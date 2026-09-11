@@ -7,9 +7,6 @@ export const CATEGORIAS = [
   "Bíceps",
   "Tríceps",
   "Abdômen",
-  "Cardio",
-  "Alongamento",
-  "Mobilidade"
 ];
 
 // Normaliza texto (minúsculas, sem acento) para comparações tolerantes.
