@@ -20,13 +20,7 @@ export const CATEGORIAS_BIBLIOTECA = [
   "Bíceps",
   "Tríceps",
   "Pernas",
-  "Glúteos",
   "Abdômen",
-  "Panturrilha",
-  "Punho",
-  "Cardio",
-  "Alongamento",
-  "Mobilidade",
 ];
 
 // Carrega a biblioteca: só exercícios com título preenchido, ordem A-Z.
