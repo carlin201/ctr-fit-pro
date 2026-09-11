@@ -200,7 +200,7 @@ img { max-width: 100%; display: block; }
 .login-link { display: block; text-align: center; margin-top: 18px; color: var(--text-muted); font-size: 14px; }
 .login-link b { color: var(--primary); }
 
-.chip-row { display: flex; flex-wrap: nowrap; gap: 8px; overflow-x: auto; overflow-y: hidden; padding-bottom: 8px; margin: 0 -20px 20px; padding-left: 20px; padding-right: 20px; -webkit-overflow-scrolling: touch; }
+.chip-row { display: flex; flex-wrap: nowrap; gap: 8px; overflow-x: auto; overflow-y: hidden; padding-bottom: 8px; margin-bottom: 20px; -webkit-overflow-scrolling: touch; width: 100%; }
 .chip-row::-webkit-scrollbar { display: none; }
 .chip {
   padding: 8px 16px; border-radius: 999px; background: var(--bg-card);
@@ -284,7 +284,7 @@ img { max-width: 100%; display: block; }
   text-shadow: 0 2px 8px rgba(0,0,0,0.5); padding: 20px;
 }
 
-.mini-video-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 6px; margin: 0 -20px 24px; padding-left: 20px; padding-right: 20px; -webkit-overflow-scrolling: touch; }
+.mini-video-row { display: flex; flex-wrap: nowrap; gap: 12px; overflow-x: auto; overflow-y: hidden; padding-bottom: 6px; margin-bottom: 24px; -webkit-overflow-scrolling: touch; width: 100%; }
 .mini-video-row::-webkit-scrollbar { display: none; }
 .mini-video-card {
   flex: 0 0 130px; background: var(--bg-card); border: 1px solid var(--border);
