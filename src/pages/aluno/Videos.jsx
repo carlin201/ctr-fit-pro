@@ -4,7 +4,7 @@
 // ============================================================
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { loadVideos, CATEGORIAS, carregarPreferenciasVideos, toggleFavoritoVideo, registrarVisualizacao, youtubeThumb, temVideo, contarPorCategoria, mesmaCategoria, normalizarTexto } from "../../services/videos.js";
+import { loadVideos, CATEGORIAS, carregarPreferenciasVideos, toggleFavoritoVideo, registrarVisualizacao, youtubeThumb, temVideo, mesmaCategoria, normalizarTexto } from "../../services/videos.js";
 import { useAuth } from "../../services/AuthContext.jsx";
 import VideoPlayer from "../../components/VideoPlayer.jsx";
 import { Play, Search, Heart, ArrowDownAZ, VideoOff } from "lucide-react";
@@ -46,8 +46,6 @@ export default function Videos() {
     }
     return base;
   }, [all, cat, q, aba, azOn, prefs]);
-
-  const contagens = useMemo(() => contarPorCategoria(all), [all]);
 
   // Só mostra chips de categorias que realmente têm vídeo cadastrado
   // (evita chips vazios tipo "Pernas (0)" bagunçando a barra), mantendo
@@ -131,7 +129,7 @@ export default function Videos() {
       <div className="chip-row">
         {categoriasComVideo.map((c) => (
           <button key={c} className={`chip ${cat === c ? "active" : ""}`} onClick={() => setCat(c)}>
-            {c} ({contagens[normalizarTexto(c)] || 0})
+            {c}
           </button>
         ))}
       </div>
