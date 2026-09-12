@@ -3,10 +3,11 @@ export const CATEGORIAS = [
   "Peito",
   "Costas",
   "Pernas",
+  "Glúteos",
   "Ombro",
   "Bíceps",
   "Tríceps",
-  "Abdômen",
+  "Abdômen"
 ];
 
 // Normaliza texto (minúsculas, sem acento) para comparações tolerantes.
