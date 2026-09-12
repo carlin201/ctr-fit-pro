@@ -45,6 +45,7 @@ import PersonalLayout from "./pages/personal/PersonalLayout.jsx";
 import Dashboard from "./pages/personal/Dashboard.jsx";
 import Alunos from "./pages/personal/Alunos.jsx";
 import CriarFicha from "./pages/personal/CriarFicha.jsx";
+import LembretePeriodico from "./components/LembretePeriodico.jsx";
 
 // Guard: aluno precisa estar logado
 function AlunoRoute({ children }) {
@@ -64,7 +65,9 @@ function PersonalRoute({ children }) {
 
 export default function App() {
   return (
-    <Routes>
+    <>
+      <LembretePeriodico />
+      <Routes>
       {/* PÚBLICAS */}
       <Route path="/login" element={<Login />} />
       <Route path="/personal/login" element={<PersonalLogin />} />
@@ -115,6 +118,7 @@ export default function App() {
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+      </Routes>
+    </>
   );
 }
