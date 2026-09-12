@@ -30,6 +30,7 @@ import {
 } from "firebase/auth";
 import { doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 import { auth, db, googleProvider } from "./firebase.js";
+import { ativarNotificacoes } from "./notifications.js";
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -52,6 +53,9 @@ export function AuthProvider({ children }) {
         } catch {
           setProfile(null);
         }
+        // Pede permissão de notificação em segundo plano — não trava o login
+        // nem quebra nada se o usuário recusar ou o navegador não suportar.
+        ativarNotificacoes(u.uid).catch(() => {});
       } else {
         setProfile(null);
       }
