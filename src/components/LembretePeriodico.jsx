@@ -10,20 +10,30 @@ import { useEffect } from "react";
 
 const INTERVALO_MS = 30 * 60 * 1000; // 30 minutos
 
-// Personalize a mensagem aqui:
+// Personalize aqui: cada vez que a notificação disparar, ela pega a
+// próxima mensagem da lista (e volta pro início quando acaba).
+// Pode adicionar, remover ou reescrever quantas quiser.
 const TITULO = "CTR Fitness";
-const MENSAGEM = "Hora de dar uma olhada no seu treino! 💪";
+const MENSAGENS = [
+  "Hora de dar uma olhada no seu treino! 💪",
+  "Já bebeu água hoje? Mantenha-se hidratado! 💧",
+  "Não esqueça de registrar seu treino de hoje ✅",
+  "Foco e consistência levam ao resultado 🔥",
+];
 
 export default function LembretePeriodico() {
   useEffect(() => {
     if (!("Notification" in window)) return undefined;
 
+    let indice = 0;
     const disparar = () => {
       if (Notification.permission !== "granted") return;
+      const mensagem = MENSAGENS[indice % MENSAGENS.length];
+      indice += 1;
       // Evita empilhar notificação em cima de notificação: usa uma "tag" fixa,
       // então a nova substitui a anterior em vez de acumular.
       new Notification(TITULO, {
-        body: MENSAGEM,
+        body: mensagem,
         icon: "/img/icon-192.png",
         tag: "lembrete-periodico",
       });
