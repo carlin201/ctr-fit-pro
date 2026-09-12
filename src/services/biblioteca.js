@@ -20,6 +20,7 @@ export const CATEGORIAS_BIBLIOTECA = [
   "Bíceps",
   "Tríceps",
   "Pernas",
+  "Glúteos",
   "Abdômen",
 ];
 
