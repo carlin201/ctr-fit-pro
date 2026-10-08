@@ -19,6 +19,7 @@ import {
   carregarBiblioteca, resolverExercicio, CATEGORIAS_BIBLIOTECA,
 } from "../../services/biblioteca.js";
 import ExercisePicker from "../../components/ExercisePicker.jsx";
+import ModelosFicha from "../../components/ModelosFicha.jsx";
 import Toast from "../../components/Toast.jsx";
 import { Plus, Trash2, Save, Download, Send, Copy, GripVertical, PlayCircle, VideoOff, CopyPlus, ChevronUp, ChevronDown } from "lucide-react";
 
@@ -236,6 +237,15 @@ export default function CriarFicha() {
 
       {alunoId && (
         <>
+          {/* Modelos: reaproveitar treino entre alunos */}
+          <ModelosFicha
+            ficha={ficha}
+            alunos={alunos}
+            alunoAtualId={alunoId}
+            onUsarModelo={(estrutura) => setFicha((f) => ({ ...f, ...estrutura }))}
+            onToast={setToast}
+          />
+
           {/* Dados da ficha */}
           <div className="card" style={{ marginBottom: 20, maxWidth: 640 }}>
             <h3 style={{ marginBottom: 14, fontSize: 16, fontWeight: 700 }}>Dados da ficha</h3>
