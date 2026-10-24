@@ -2,7 +2,7 @@
 // PersonalLayout.jsx — Layout com menu lateral do Personal.
 // ============================================================
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Users, ClipboardEdit, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, ClipboardEdit, LayoutTemplate, LogOut } from "lucide-react";
 
 export default function PersonalLayout() {
   const nav = useNavigate();
@@ -17,6 +17,7 @@ export default function PersonalLayout() {
         <NavLink to="/personal/dashboard" className={link}><LayoutDashboard size={18}/> Dashboard</NavLink>
         <NavLink to="/personal/alunos" className={link}><Users size={18}/> Alunos</NavLink>
         <NavLink to="/personal/criar-ficha" className={link}><ClipboardEdit size={18}/> Criar Ficha</NavLink>
+        <NavLink to="/personal/fichas-prontas" className={link}><LayoutTemplate size={18}/> Fichas Prontas</NavLink>
         <button className="logout" onClick={sair} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 10, marginTop: "auto" }}>
           <LogOut size={18}/> Sair
         </button>
