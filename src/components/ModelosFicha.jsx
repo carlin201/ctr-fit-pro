@@ -119,7 +119,7 @@ export default function ModelosFicha({ ficha, alunos = [], alunoAtualId, onUsarM
 }
 
 // Modal: escolher alunos e aplicar o treino em todos de uma vez.
-function EnviarVariosModal({ estrutura, alunos, onClose, onToast }) {
+export function EnviarVariosModal({ estrutura, alunos, onClose, onToast }) {
   const [busca, setBusca] = useState("");
   const [marcados, setMarcados] = useState({});
   const [comFicha, setComFicha] = useState({});
