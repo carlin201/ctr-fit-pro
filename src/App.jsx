@@ -28,6 +28,7 @@ import { useAuth } from "./services/AuthContext.jsx";
 
 import Login from "./pages/Login.jsx";
 import FirstAccess from "./pages/FirstAccess.jsx";
+import FaleConosco from "./pages/FaleConosco.jsx";
 
 import AlunoLayout from "./pages/aluno/AlunoLayout.jsx";
 import Home from "./pages/aluno/Home.jsx";
@@ -46,6 +47,7 @@ import Dashboard from "./pages/personal/Dashboard.jsx";
 import Alunos from "./pages/personal/Alunos.jsx";
 import CriarFicha from "./pages/personal/CriarFicha.jsx";
 import FichasProntas from "./pages/personal/FichasProntas.jsx";
+import CaixaSugestoes from "./pages/personal/CaixaSugestoes.jsx";
 import LembretePeriodico from "./components/LembretePeriodico.jsx";
 
 // Guard: aluno precisa estar logado
@@ -72,6 +74,7 @@ export default function App() {
       {/* PÚBLICAS */}
       <Route path="/login" element={<Login />} />
       <Route path="/personal/login" element={<PersonalLogin />} />
+      <Route path="/fale-conosco" element={<FaleConosco />} />
 
       {/* Primeiro acesso (precisa estar logado, sem perfil ainda) */}
       <Route path="/primeiro-acesso" element={<FirstAccess />} />
@@ -116,6 +119,7 @@ export default function App() {
         <Route path="/personal/alunos" element={<Alunos />} />
         <Route path="/personal/criar-ficha" element={<CriarFicha />} />
         <Route path="/personal/fichas-prontas" element={<FichasProntas />} />
+        <Route path="/personal/caixa-sugestoes" element={<CaixaSugestoes />} />
       </Route>
 
       {/* Fallback */}
